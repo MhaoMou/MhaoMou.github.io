@@ -14,9 +14,10 @@
         body {
             padding-top: 56px; /* Space for fixed navbar */
             font-family: 'Roboto', sans-serif;
+            font-size: 18px; /* Increased font size */
         }
         .navbar {
-            background-color: #add8e6; /* Light blue background */
+            background-color: #007bff; /* Updated navigation bar color */
         }
         .navbar-brand, .nav-link {
             font-weight: bold;
@@ -29,15 +30,17 @@
         .section-heading {
             margin-top: 20px;
             margin-bottom: 10px;
+            font-size: 28px; /* Increased font size for section headings */
         }
         .footer {
             margin-top: 20px;
             padding: 20px;
             background-color: #f8f9fa;
             text-align: center;
+            font-size: 16px; /* Adjusted font size */
         }
-        .nav-link {
-            cursor: pointer;
+        ul {
+            font-size: 20px; /* Increased font size for list items */
         }
     </style>
 </head>
@@ -45,7 +48,7 @@
 <body>
 
     <!-- Navigation Bar -->
-    <nav class="navbar navbar-expand-lg fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
         <div class="container">
             <a class="navbar-brand" href="#">Minghao Mou</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
@@ -54,16 +57,16 @@
             <div class="collapse navbar-collapse" id="navbarResponsive">
                 <ul class="navbar-nav ml-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="#bio">Bio 👤</a>
+                        <a class="nav-link" href="#bio">Bio </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#news">News 📰</a>
+                        <a class="nav-link" href="#news">News </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#education">Education 🎓</a>
+                        <a class="nav-link" href="#education">Education </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#teaching">Teaching 📚</a>
+                        <a class="nav-link" href="#teaching">Teaching </a>
                     </li>
                 </ul>
             </div>
@@ -80,7 +83,6 @@
                     <h2 class="section-heading">Bio</h2>
                     <p>I am currently a Ph.D. student in the Elmore Family School of Electrical and Computer Engineering at Purdue University. My research interests include electric vehicle charging infrastructure and smart grid technologies.</p>
                     <p>Email: mmou@purdue.edu</p>
-                    <!-- Social Links Here -->
                 </div>
                 <div class="col-lg-4">
                     <img src="./OL_files/instc 2023-12-22 134549.039.jpeg" alt="Minghao Mou" class="profile-pic">
@@ -90,7 +92,7 @@
 
         <!-- News Section -->
         <div id="news" class="mt-4">
-            <h2 class="section-heading">News</h2>
+            <h2 class="section-heading">News 📰</h2>
             <ul>
                 <li>01/2024: The paper <b>Nexus Cognizant Pricing of Workplace Electric Vehicle Charging</b> is accepted by ACC 2024. 👍</li>
                 <li>08/2023: Joined Elmore Family School of Electrical and Computer Engineering at Purdue University as a Ph.D. student. 🎉</li>
@@ -100,7 +102,7 @@
 
         <!-- Education Section -->
         <div id="education" class="mt-4">
-            <h2 class="section-heading">Education</h2>
+            <h2 class="section-heading">Education 📖</h2>
             <ul>
                 <li>Ph.D. in Electrical and Computer Engineering, Purdue University, Present 📚</li>
                 <li>B.Sc. in Mathematics (First-class Honor), The Chinese University of Hong Kong, Shenzhen, 2022 🏅</li>
@@ -109,7 +111,7 @@
 
         <!-- Teaching Section -->
         <div id="teaching" class="mt-4">
-            <h2 class="section-heading">Teaching</h2>
+            <h2 class="section-heading">Teaching 👋</h2>
             <ul>
                 <li>Teaching Assistant, MAT4010: Functional Analysis, CUHK(SZ), Spring 2023 📖</li>
                 <li>Teaching Assistant, MAT4220: Partial Differential Equations, CUHK(SZ), Fall 2022 📘</li>
@@ -120,7 +122,7 @@
 
     <!-- Footer -->
     <footer class="footer">
-        <p>&copy; 2024 Minghao Mou</p>
+        <p>Last updated: <script>document.write(new Date().toLocaleDateString());</script></p>
     </footer>
 
     <!-- Bootstrap core JavaScript -->
