@@ -1,181 +1,121 @@
-<!DOCTYPE html
-  PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html>
+<!DOCTYPE html>
+<html lang="en">
 
 <head>
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-GM4LVVKPRS"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag() { dataLayer.push(arguments); }
-    gtag('js', new Date());
-
-    gtag('config', 'G-GM4LVVKPRS');
-  </script>
-
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-  <meta name="description" content="PhD Student at Purdue ECE" />
-  <meta name="twitter:card" content="summary" />
-  <meta name="twitter:site" content="" />
-  <meta name="twitter:creator" content="" />
-  <meta property="og:url" content="https://mhaomou.github.io/" />
-  <meta property="og:title" content="Mou, Minghao" />
-  <meta property="og:description" content="PhD Student at Purdue ECE" />
-  <meta property="og:image" content="https://MhaoMou.github.io/OL_files/IMG_0732.png" />
-  <link rel="shortcut icon" href="./OL_files/orlitany-ai.png" />
-
-
-  <script type="application/ld+json">
-{
-"@context": "http://www.schema.org",
-"@type": "Person",
-"@id": "https://orlitany.github.io/#person",
-"name": "Mou, Minghao",
-"alumniOf": [
-  {
-		"@type": "CollegeOrUniversity",
-		"name": "Purdue University",
-		"sameAs": [
-			"https://www.purdue.edu/",
-		]
-  },
-	{
-	 "@type": "CollegeOrUniversity",
-	 "name": "Purdue University",
-	 "sameAs": "https://www.purdue.edu",
-	},
-	{
-	 "@type": "CollegeOrUniversity",
-	 "name": "Hebrew University of Jerusalem",
-     "sameAs": "https://en.wikipedia.org/wiki/Hebrew_University_of_Jerusalem"
-	}
-],
-"gender": "Male",
-"Description": "PhD Student at Purdue ECE",
-"disambiguatingDescription": "",
-"jobTitle": "Student",
-"worksFor": [
-	{
-		"@type": "Organization",
-		"name": "Purdue",
-		"sameAs": [
-			"https://www.purdue.edu"
-		]
-	}
-],
-"url": "https://orlitany.github.io",
-"image": "https://orlitany.github.io/OL_files/orlitany_ieee_profilepic.jpg",
-"address": {
-	"@type": "PostalAddress",
-	"addressLocality": "Sunnyvale",
-	"addressRegion": "CA",
-	"addressCountry": "US"
-},
-"sameAs": [
-	"https://www.linkedin.com/in/orlitany/",
-	"https://www.facebook.com/OrLitovsky",
-	"https://twitter.com/orlitany",
-	"https://scholar.google.co.il/citations?user=Ihs8dwsAAAAJ&hl=en",
-    "https://github.com/orlitany/",
-    "https://geometry.stanford.edu/member/orlitany/",
-    "https://dblp.org/pers/hd/l/Litany:Or",
-    "https://www.researchgate.net/profile/Or_Litany",
-    "http://ai.stanford.edu/~orlitany"
-	]
-}
-</script>
-
-  <title>Mou, Minghao</title>
-
-  <link rel="stylesheet" href="./OL_files/bootstrap.min.css">
-  <link href="./OL_files/style.css" rel="stylesheet" type="text/css">
-  <script type="text/javascript" async="" src="./OL_files/ga.js.download"></script>
-  <script type="text/javascript" src="./OL_files/hidebib.js.download"></script>
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mou, Minghao</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Custom CSS -->
+    <style>
+        body {
+            padding-top: 56px; /* Space for fixed navbar */
+        }
+        .navbar-brand, .nav-link {
+            font-weight: bold;
+        }
+        .profile-pic {
+            max-width: 100%;
+            height: auto;
+        }
+        .section-heading {
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+        .footer {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            text-align: center;
+        }
+    </style>
 </head>
 
 <body>
 
-  <!-- Start main content -->
-  <main id="vue-app">
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="#">Minghao Mou</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarResponsive">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item active">
+                        <a class="nav-link" href="#bio">Bio</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#news">News</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#education">Education</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#teaching">Teaching</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
     <div class="container">
-      <!-- <table width="900" border="0" align="center" cellpadding="20"></table> -->
-      <table width="90%" align="center" border="0" cellpadding="10">
-        <tbody>
-          <tr>
-            <td width="70%" valign="top">
-              <p align="center">&nbsp;</p>
 
-              <!-- BIO -->
-              <p align="center">
-                <font size="6px"><b>Mou, Minghao</b> 👤</font><br>
-              </p>
-              <p style="font-family: 'Roboto', sans-serif;">mmou@purdue.edu</p>
-              <p>I am currently a phd student in Elmore Family School of Electrical and Computer Engineering at <a href = "https://purdue.edu">Purdue University</a>.              
-              </p>
+        <!-- Bio Section -->
+        <div id="bio" class="mt-4">
+            <div class="row">
+                <div class="col-lg-8">
+                    <h2 class="section-heading">Bio</h2>
+                    <p>I am currently a Ph.D. student in Elmore Family School of Electrical and Computer Engineering at Purdue University.</p>
+                    <p>Email: mmou@purdue.edu</p>
+                    <!-- Social Links Here -->
+                </div>
+                <div class="col-lg-4">
+                    <img src="./OL_files/instc 2023-12-22 134549.039.jpeg" alt="Minghao Mou" class="profile-pic">
+                </div>
+            </div>
+        </div>
 
-              <!-- Links -->
-              <p><a href="./OL_files/Minghao_CV.pdf"><img src="./OL_files/cv.png" height="16"></a> /
-                <a href="https://www.linkedin.com/in/minghao-mou-14a090289/"><img src="./OL_files/linkedin.png"
-                    height="16"></a> /
-                <a href="https://twitter.com"><img src="./OL_files/twitterlogo.png" height="16"></a> /
-                <a href="https://scholar.google.com" target="_blank"><img
-                    src="./OL_files/google_scholar.png" height="16"></a> /
-                <a href="https://github.com/MhaoMou?tab=repositories" target="_blank"><img src="./OL_files/github_alt.png"
-                    height="16"></a>
-              </p>
-            </td>
-            <td width="30%">
-              <div class="instructorphoto"><img typeof="foaf:Image" src="./OL_files/instc 2023-12-22 134549.039.jpeg"
-                  id="orlitany" alt="Or Litany profile picture"></div>
-            </td>
+        <!-- News Section -->
+        <div id="news" class="mt-4">
+            <h2 class="section-heading">News</h2>
+            <ul>
+                <li>The paper <b>Nexus Cognizant Pricing of Workplace Electric Vehicle Charging</b> is accepted by ACC 2024.</li>
+                <!-- More news items here -->
+            </ul>
+        </div>
 
-          </tr>
-        </tbody>
-      </table>
+        <!-- Education Section -->
+        <div id="education" class="mt-4">
+            <h2 class="section-heading">Education</h2>
+            <ul>
+                <li>Ph.D., Electrical and Computer Engineering, Purdue University.</li>
+                <!-- More education items here -->
+            </ul>
+        </div>
+
+        <!-- Teaching Section -->
+        <div id="teaching" class="mt-4">
+            <h2 class="section-heading">Teaching</h2>
+            <ul>
+                <li>Teaching Assistant, MAT4010: Functional Analysis, CUHK(SZ), Spring 2023</li>
+                <!-- More teaching items here -->
+            </ul>
+        </div>
+
     </div>
-    <br>
 
-    <div class="container">
-      <h2><b>News</b> 📰</h2><div class="news">
-    <ul>
-	    <li>The paper <b>Nexus Cognizant Pricing of Workplace Eletric Vehicle Charging</b> is accepted by ACC 2024. 👍</li>
-	    <li>I joined <a href = "https://engineering.purdue.edu/ECE">Elmore family School of Electrical and Computer Engineering</a> at Purdue University as a PhD student. 👍</li>
-	    <li>I graduated from <a href = "https://www.cuhk.edu.cn">The Chinese University of Hong Kong, Shenzhen</a> with a first-class honor. 👍</li>
-    </ul>
-    </div></div>
-    <br>
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2024 Minghao Mou</p>
+    </footer>
 
-    <div class="container">
-      <h2><b>Education</b> 🧑‍🎓</h2><div class="news">
-    <ul>
-	    <li>Ph.D., <a href = "https://engineering.purdue.edu/ECE">Elmore family School of Electrical and Computer Engineering</a>, Purdue University. </li>
-	    <li>B.Sc (first-class honor), Mathematics, <a href = "https://www.cuhk.edu.cn">The Chinese University of Hong Kong, Shenzhen</a>. </li>
-    </ul>
-    </div></div>
-    <br>
-
-   <div class="container">
-      <h2><b>Teaching</b> 📖</h2><div class="news">
-    <ul>
-	    <li><b>Teaching Assistant</b>, MAT4010: Functional Analysis, CUHK(SZ), 2023 Spring</li>
-	    <li><b>Teaching Assistant</b>, MAT4220: Partial Differential Equations, CUHK(SZ), 2022 Fall</li>
-    </ul>
-    </div></div>
-    <br>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.1.6/vue.min.js"></script>
-    <script src="helper_functions/load_dicts_from_json.js"></script>
-  
-    <script xml:space="preserve" language="JavaScript">
-      hideallbibs();
-    </script>
-
-  </main>
-
-
+    <!-- Bootstrap core JavaScript -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 
 </html>
