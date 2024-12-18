@@ -597,16 +597,3 @@ footer {
 }
 
 
-
-
-
-$base-font-size: 16px;
-$scale-factor: 1.2;
-
-html {
-  font-size: $base-font-size * $scale-factor; // e.g., 19.2px if $scale-factor is 1.2
-}
-
-body {
-  font-size: 1rem; // 1rem will scale based on the $base-font-size
-}
