@@ -4,7 +4,7 @@ layout: homepage
 
 ## About Me
 
-I am a Ph.D. student in Elmore School of Electrical and Computer Engineering at Purdue University.
+I am a Ph.D. student in [Elmore Family School of Electrical and Computer Engineering]{https://engineering.purdue.edu/ECE} at [Purdue University]{https://www.purdue.edu}.
 
 ## Research Interests
 
