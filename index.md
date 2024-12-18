@@ -14,6 +14,7 @@ I am a Ph.D. student in Elmore School of Electrical and Computer Engineering at 
 
 - **[Dec. 2024]** 
 
+<!---
 {% include_relative _includes/publications.md %}
-
 {% include_relative _includes/services.md %}
+-->
