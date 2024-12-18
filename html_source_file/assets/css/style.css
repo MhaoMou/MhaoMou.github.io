@@ -172,3 +172,12 @@ footer { width: 232px; float: left; position: fixed; bottom: 30px; -webkit-font-
 .fakelink { text-decoration: none; cursor: pointer; }
 
 .bibref { font-size: 70%; margin-top: 10px; margin-left: 0px; display: none; font-family: monospace; }
+
+body {
+  transform: scale(1.5); /* Scale everything */
+  transform-origin: top left;
+}
+
+img {
+  width: 150%; /* Scale images */
+}
