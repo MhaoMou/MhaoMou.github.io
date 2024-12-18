@@ -1,10 +1,11 @@
 @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,500;0,600;1,500;1,600&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Ubuntu+Mono&display=swap');
+@import url('https://cdn.jsdelivr.net/gh/google/fonts/tex-gyre-pagella/tex-gyre-pagella.css');
 
 body {
   background-color: #fff;
   padding:0px;
-  font: 24.0px/Latin Modern Roman, serif; 
+  font: 24.0px/TeX Gyre Pagella, serif; 
   color:#595959;
   font-weight:400;
   margin:0
