@@ -1,3 +1,8 @@
+body {
+  transform: scale(1.2); /* Adjust the scale factor as needed */
+  transform-origin: top left; /* Keep the scaling aligned from the top-left corner */
+}
+
 .pub-row {
   display: flex; 
   align-items: center;}
