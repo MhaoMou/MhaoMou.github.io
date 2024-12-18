@@ -12,6 +12,6 @@ I am a Ph.D. student in [Elmore Family School of Electrical and Computer Enginee
 
 ## News
 
-- **[Dec. 2024]** 
+- **[May. 2023]** I graduated from CUHKSZ with a first-class honor.
 
 {% include_relative _includes/publications.md %}
