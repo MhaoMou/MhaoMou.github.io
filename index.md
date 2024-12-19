@@ -12,6 +12,7 @@ I am a Ph.D. student in [Elmore Family School of Electrical and Computer Enginee
 
 ## News
 
-- **[May. 2023]** I graduated from CUHKSZ with a first-class honor.
+- **[Dec. 2023]** Our paper *Nexus Cognizant Pricing of Workplace Electric Vehicle Charging* is accepted to ACC2024
+- **[May. 2023]** I graduated from CUHKSZ with a first-class honor
 
 {% include_relative _includes/publications.md %}
