@@ -10,7 +10,7 @@ main:
     code:
     bibtex:
     doi: https://doi.org/10.48550/arXiv.2512.12197
-    image:
+    image: ./assets/img/braess_fig6.png
     notes: Preprint
 
   - title: Nexus Cognizant Pricing of Workplace Electric Vehicle Charging
