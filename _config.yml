@@ -2,21 +2,22 @@
 title: Minghao Mou
 position: Ph.D. Student
 affiliation: Purdue University
+affiliation_link: https://www.purdue.edu/
 email: mmou@purdue.edu
 
 # Search Engine Optimization (SEO)
 # The following information is used to improve the website traffic from search engines, e.g., Google.
-keywords: minimal light
-description: The Minimal Light is a simple and elegant jekyll theme for academic personal homepage.
-canonical: https://minimal-light-theme.yliu.me/
+keywords: Minghao Mou, Purdue University, coupled infrastructure systems, generative models, optimal control, transportation electrification
+description: Personal academic webpage of Minghao Mou, a Ph.D. student at Purdue University working on coupled infrastructure systems, generative models, and optimal control.
+canonical: https://MhaoMou.github.io/
 
 # Links 
 # If you don't need one of them, you may delete the corresponding line.
 google_scholar: https://scholar.google.com/citations?user=lDU4ZtQAAAAJ&hl=en
 cv_link: assets/files/curriculum_vitae.pdf
-github_link: https://github.com/
+github_link: https://github.com/MhaoMou
 linkedin: https://www.linkedin.com/in/minghao-mou-14a090289/
-twitter: https://twitter.com/
+# twitter:
 
 # Images (e.g., your profile picture and your website's favicon) 
 # "favicon" and "favicon_dark" are used for the light and dark modes, respectively. 
@@ -39,6 +40,10 @@ font: "Serif" # or "Sans Serif"
 # Google Analytics ID
 # Please remove this if you don't use Google Analytics
 # google_analytics: UA-111540567-4
+
+# Lightweight public page-view badge for the footer.
+hit_counter_badge: "https://hits.sh/MhaoMou.github.io.svg?view=today-total&style=flat-square&label=views&color=002D72&labelColor=0F6F6E"
+hit_counter_link: https://hits.sh/MhaoMou.github.io/
 
 # Use this project as a remote theme for GitHub Pages
 # See the guide here: https://docs.github.com/en/pages/setting-up-a-github-pages-site-with-jekyll/adding-a-theme-to-your-github-pages-site-using-jekyll

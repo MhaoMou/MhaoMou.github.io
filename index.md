@@ -8,11 +8,18 @@ I am a Ph.D. student in [Elmore Family School of Electrical and Computer Enginee
 
 ## Research Interests
 
-- **Coupled Infrastructure Systems**
+<div class="interest-grid">
+  <span>Coupled Infrastructure Systems</span>
+  <span>Generative Models</span>
+  <span>Optimal Control</span>
+</div>
 
 ## News
 
-- **[Dec. 2023]** Our paper *Nexus Cognizant Pricing of Workplace Electric Vehicle Charging* is accepted to ACC2024
-- **[May. 2023]** I graduated from CUHKSZ with a first-class honor
+<ul class="news-list">
+  <li><strong>[Apr. 2026]</strong> Our preprint <em>Braess' Paradoxes in Coupled Power and Transportation Systems</em> was revised on arXiv.</li>
+  <li><strong>[Dec. 2023]</strong> Our paper <em>Nexus Cognizant Pricing of Workplace Electric Vehicle Charging</em> was accepted to ACC 2024.</li>
+  <li><strong>[May. 2023]</strong> I graduated from CUHKSZ with first-class honors.</li>
+</ul>
 
 {% include_relative _includes/publications.md %}

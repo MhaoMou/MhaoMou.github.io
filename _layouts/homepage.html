@@ -46,7 +46,7 @@
         <h1>{{ site.title }}</h1>
 
         {% if site.position %}
-        <position style="font-size:1.10rem;">{{ site.position }}</position>
+        <position>{{ site.position }}</position>
         <br>
         {% endif %}
         {% if site.affiliation %}
@@ -101,6 +101,13 @@
 
       {% if site.enable_footnote %}
       <p><small>Powered by Jekyll and <a href="https://github.com/yaoyao-liu/minimal-light" target="_blank" rel="noopener">Minimal Light</a> theme.</small></p>
+      {% endif %}
+
+      {% if site.hit_counter_badge %}
+      <a class="page-tracker" href="{{ site.hit_counter_link }}" target="_blank" rel="noopener" aria-label="Page view counter">
+        <span>Page views</span>
+        <img src="{{ site.hit_counter_badge | escape }}" alt="Page view counter">
+      </a>
       {% endif %}
 
       </section>

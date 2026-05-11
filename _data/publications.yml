@@ -1,5 +1,18 @@
 main:
 
+  - title: "Braess' Paradoxes in Coupled Power and Transportation Systems"
+    authors: Minghao Mou, Junjie Qin
+    conference_short: arXiv
+    conference: "arXiv preprint arXiv:2512.12197, 2025"
+    pdf: https://arxiv.org/pdf/2512.12197
+    page: https://arxiv.org/abs/2512.12197
+    page_label: arXiv
+    code:
+    bibtex:
+    doi: https://doi.org/10.48550/arXiv.2512.12197
+    image:
+    notes: Preprint
+
   - title: Nexus Cognizant Pricing of Workplace Electric Vehicle Charging
     authors: Minghao Mou, Sean Qian, Junjie Qin
     conference_short: ACC
