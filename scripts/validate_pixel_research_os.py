@@ -11,6 +11,14 @@ LEGACY_INDEX = ROOT / "index.md"
 CSS = ROOT / "assets/css/pixel-research-os.css"
 JS = ROOT / "assets/js/pixel-research-os.js"
 
+LEGACY_ACC_BIBTEX_URL = (
+    "https://scholar.googleusercontent.com/scholar.bib?"
+    "q=info:2aKsKkaCZN8J:scholar.google.com/&output=citation&"
+    "scisdr=ClEwu4xGEIz_i9RBe8o:AFWwaeYAAAAAZ2NHY8rMyvVbiTtta4oAMCCgeKw&"
+    "scisig=AFWwaeYAAAAAZ2NHY9hCxuAekf9tLmJHrGasrPE&scisf=4&ct=citation&"
+    "cd=-1&hl=en"
+)
+
 REQUIRED_FILES = [
     "assets/files/curriculum_vitae.pdf",
     "assets/img/IMG_5612.jpeg",
@@ -69,7 +77,7 @@ REQUIRED_ANCHOR_HREFS = [
     "https://arxiv.org/abs/2512.12197",
     "https://doi.org/10.48550/arXiv.2512.12197",
     "https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=10644866",
-    "https://scholar.googleusercontent.com/scholar.bib?q=info:2aKsKkaCZN8J:scholar.google.com/&output=citation&scisdr=ClEwu4xGEIz_i9RBe8o:AFWwaeYAAAAAZ2NHY8rMyvVbiTtta4oAMCCgeKw&scisig=AFWwaeYAAAAAZ2NHY9hCxuAekf9tLmJHrGasrPE&scisf=4&ct=citation&cd=-1&hl=en",
+    LEGACY_ACC_BIBTEX_URL,
 ]
 
 REQUIRED_STYLESHEET_HREFS = [
@@ -96,9 +104,10 @@ REQUIRED_FAVICON_HREFS = [
 class StructureParser(HTMLParser):
     def __init__(self):
         super().__init__()
-        self.ids = set()
         self.section_ids = set()
-        self.alt_texts = []
+        self.image_alts = []
+        self.text_parts = []
+        self.skip_text_depth = 0
         self.anchors = set()
         self.stylesheets = set()
         self.favicons = set()
@@ -107,18 +116,20 @@ class StructureParser(HTMLParser):
         self.has_main = False
         self.has_nav = False
         self.has_h1 = False
-        self.buttons = 0
 
     def handle_starttag(self, tag, attrs):
+        tag = tag.lower()
         attrs = dict(attrs)
-        if "id" in attrs:
-            self.ids.add(attrs["id"])
-            if tag == "section":
-                self.section_ids.add(attrs["id"])
+        if tag in {"script", "style"}:
+            self.skip_text_depth += 1
+        if tag == "section" and attrs.get("id"):
+            self.section_ids.add(attrs["id"])
         if tag == "img":
-            self.alt_texts.append(attrs.get("alt", ""))
-            if attrs.get("src"):
-                self.images.add(self.normalize(attrs["src"]))
+            src = self.normalize(attrs.get("src", ""))
+            alt = self.normalize(attrs.get("alt", ""))
+            self.image_alts.append((src, alt))
+            if src:
+                self.images.add(src)
         if tag == "a" and attrs.get("href"):
             self.anchors.add(self.normalize(attrs["href"]))
         if tag == "link" and attrs.get("href"):
@@ -135,16 +146,109 @@ class StructureParser(HTMLParser):
             self.has_nav = True
         if tag == "h1":
             self.has_h1 = True
-        if tag == "button" or (tag == "a" and "button" in attrs.get("class", "")):
-            self.buttons += 1
+
+    def handle_endtag(self, tag):
+        if tag.lower() in {"script", "style"} and self.skip_text_depth:
+            self.skip_text_depth -= 1
+
+    def handle_data(self, data):
+        if not self.skip_text_depth:
+            self.text_parts.append(data)
 
     def normalize(self, value):
         return unescape(value)
 
 
-def fail(message):
-    print(f"FAIL: {message}")
-    return 1
+def normalize_visible_text(value):
+    return " ".join(unescape(value).split())
+
+
+def strip_css_comments(value):
+    return re.sub(r"/\*.*?\*/", "", value, flags=re.DOTALL)
+
+
+def strip_js_comments(value):
+    result = []
+    index = 0
+    quote = None
+    escaped = False
+
+    while index < len(value):
+        char = value[index]
+        next_char = value[index + 1] if index + 1 < len(value) else ""
+
+        if quote:
+            result.append(char)
+            if escaped:
+                escaped = False
+            elif char == "\\":
+                escaped = True
+            elif char == quote:
+                quote = None
+            index += 1
+            continue
+
+        if char in {"'", '"', "`"}:
+            quote = char
+            result.append(char)
+            index += 1
+            continue
+
+        if char == "/" and next_char == "/":
+            index += 2
+            while index < len(value) and value[index] not in "\r\n":
+                index += 1
+            if index < len(value):
+                result.append(value[index])
+                index += 1
+            continue
+
+        if char == "/" and next_char == "*":
+            index += 2
+            while index + 1 < len(value) and value[index:index + 2] != "*/":
+                index += 1
+            index = min(index + 2, len(value))
+            result.append(" ")
+            continue
+
+        result.append(char)
+        index += 1
+
+    return "".join(result)
+
+
+def has_reduced_motion_rule(css):
+    return re.search(
+        r"@media[^{]*prefers-reduced-motion[^{]*\{",
+        strip_css_comments(css),
+        re.IGNORECASE,
+    )
+
+
+def has_focus_visible_selector(css):
+    return re.search(r":focus-visible\b[^{}]*\{", strip_css_comments(css))
+
+
+def has_design_tokens(css):
+    uncommented_css = strip_css_comments(css)
+    return (
+        re.search(r"--accent\s*:", uncommented_css)
+        and re.search(r"--bg\s*:", uncommented_css)
+    )
+
+
+def has_match_media_call(js):
+    return re.search(r"\bmatchMedia\s*\(", strip_js_comments(js))
+
+
+def has_fake_expertise_claim(text):
+    return re.search(
+        r"(?<!\d)(?:9\d|100)%(?!\d)|"
+        r"(?<!\d)(?:5\s*/\s*5|10\s*/\s*10)(?!\d)|"
+        r"\bexpert\s+level\b",
+        text,
+        re.IGNORECASE,
+    )
 
 
 def main():
@@ -167,12 +271,13 @@ def main():
     css = CSS.read_text(encoding="utf-8") if CSS.exists() else ""
     js = JS.read_text(encoding="utf-8") if JS.exists() else ""
 
-    for text in REQUIRED_TEXT:
-        if text not in html:
-            failures.append(f"required text missing from index.html: {text}")
-
     parser = StructureParser()
     parser.feed(html)
+    visible_text = normalize_visible_text("".join(parser.text_parts))
+
+    for text in REQUIRED_TEXT:
+        if normalize_visible_text(text) not in visible_text:
+            failures.append(f"required text missing from index.html: {text}")
 
     for link in REQUIRED_ANCHOR_HREFS:
         if unescape(link) not in parser.anchors:
@@ -201,19 +306,20 @@ def main():
         if section_id not in parser.section_ids:
             failures.append(f"required section id missing: {section_id}")
 
-    if any(not alt.strip() for alt in parser.alt_texts):
-        failures.append("all images need non-empty alt text")
+    for src, alt in parser.image_alts:
+        if not alt.strip():
+            failures.append(f"image missing alt text: {src or '<missing src>'}")
 
-    if "prefers-reduced-motion" not in css:
+    if not has_reduced_motion_rule(css):
         failures.append("CSS must include prefers-reduced-motion handling")
-    if ":focus-visible" not in css:
+    if not has_focus_visible_selector(css):
         failures.append("CSS must include visible focus styles")
-    if "--accent" not in css or "--bg" not in css:
+    if not has_design_tokens(css):
         failures.append("CSS must define centralized design tokens")
-    if "matchMedia" not in js:
+    if not has_match_media_call(js):
         failures.append("JS must use matchMedia for reduced-motion or responsive behavior")
 
-    if re.search(r"Level\s+\d+|95%|99%", html, re.IGNORECASE):
+    if has_fake_expertise_claim(visible_text):
         failures.append("remove fake skill levels or gamified expertise claims")
     blocked_markers = ("to" + "do", "tb" + "d", "fix" + "me")
     if any(marker in (html + css + js).lower() for marker in blocked_markers):
