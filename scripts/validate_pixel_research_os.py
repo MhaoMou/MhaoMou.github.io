@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+from html import unescape
 from html.parser import HTMLParser
 from pathlib import Path
 import re
@@ -37,6 +38,8 @@ REQUIRED_TEXT = [
     "Braess' Paradoxes in Coupled Power and Transportation Systems",
     "Nexus Cognizant Pricing of Workplace Electric Vehicle Charging",
     "Sean Qian",
+    "Preprint",
+    "Oral Presentation",
     "American Control Conference, 2024",
     "arXiv preprint arXiv:2512.12197, 2025",
     "May 2026",
@@ -68,15 +71,19 @@ REQUIRED_LINKS = [
     "https://arxiv.org/abs/2512.12197",
     "https://doi.org/10.48550/arXiv.2512.12197",
     "https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=10644866",
+    "https://scholar.googleusercontent.com/scholar.bib?q=info:2aKsKkaCZN8J:scholar.google.com/&output=citation&scisdr=ClEwu4xGEIz_i9RBe8o:AFWwaeYAAAAAZ2NHY8rMyvVbiTtta4oAMCCgeKw&scisig=AFWwaeYAAAAAZ2NHY9hCxuAekf9tLmJHrGasrPE&scisf=4&ct=citation&cd=-1&hl=en",
 ]
+
 
 class StructureParser(HTMLParser):
     def __init__(self):
         super().__init__()
         self.ids = set()
+        self.section_ids = set()
         self.alt_texts = []
         self.hrefs = []
         self.srcs = []
+        self.links = set()
         self.has_main = False
         self.has_nav = False
         self.has_h1 = False
@@ -86,12 +93,16 @@ class StructureParser(HTMLParser):
         attrs = dict(attrs)
         if "id" in attrs:
             self.ids.add(attrs["id"])
+            if tag == "section":
+                self.section_ids.add(attrs["id"])
         if tag == "img":
             self.alt_texts.append(attrs.get("alt", ""))
             if attrs.get("src"):
-                self.srcs.append(attrs["src"])
-        if tag == "a" and attrs.get("href"):
-            self.hrefs.append(attrs["href"])
+                self.add_src(attrs["src"])
+        if tag in {"a", "link"} and attrs.get("href"):
+            self.add_href(attrs["href"])
+        if tag == "script" and attrs.get("src"):
+            self.add_src(attrs["src"])
         if tag == "main":
             self.has_main = True
         if tag == "nav":
@@ -101,9 +112,21 @@ class StructureParser(HTMLParser):
         if tag == "button" or (tag == "a" and "button" in attrs.get("class", "")):
             self.buttons += 1
 
+    def add_href(self, value):
+        normalized = unescape(value)
+        self.hrefs.append(normalized)
+        self.links.add(normalized)
+
+    def add_src(self, value):
+        normalized = unescape(value)
+        self.srcs.append(normalized)
+        self.links.add(normalized)
+
+
 def fail(message):
     print(f"FAIL: {message}")
     return 1
+
 
 def main():
     failures = []
@@ -129,12 +152,12 @@ def main():
         if text not in html:
             failures.append(f"required text missing from index.html: {text}")
 
-    for link in REQUIRED_LINKS:
-        if link not in html:
-            failures.append(f"required link missing from index.html: {link}")
-
     parser = StructureParser()
     parser.feed(html)
+
+    for link in REQUIRED_LINKS:
+        if unescape(link) not in parser.links:
+            failures.append(f"required link missing from index.html: {link}")
 
     if not parser.has_main:
         failures.append("index.html needs a <main> landmark")
@@ -144,7 +167,7 @@ def main():
         failures.append("index.html needs an <h1>")
 
     for section_id in REQUIRED_IDS:
-        if section_id not in parser.ids:
+        if section_id not in parser.section_ids:
             failures.append(f"required section id missing: {section_id}")
 
     if any(not alt.strip() for alt in parser.alt_texts):
