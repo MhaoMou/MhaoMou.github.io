@@ -60,16 +60,8 @@ REQUIRED_IDS = [
     "contact",
 ]
 
-REQUIRED_LINKS = [
-    "assets/css/pixel-research-os.css",
-    "assets/js/pixel-research-os.js",
+REQUIRED_ANCHOR_HREFS = [
     "assets/files/curriculum_vitae.pdf",
-    "assets/img/avatar.png",
-    "assets/img/IMG_5612.jpeg",
-    "assets/img/braess_fig6.png",
-    "assets/img/comp.jpg",
-    "assets/img/favicon.png",
-    "assets/img/favicon-dark.png",
     "https://scholar.google.com/citations?user=lDU4ZtQAAAAJ&hl=en",
     "https://github.com/MhaoMou",
     "https://www.linkedin.com/in/minghao-mou-14a090289/",
@@ -80,6 +72,26 @@ REQUIRED_LINKS = [
     "https://scholar.googleusercontent.com/scholar.bib?q=info:2aKsKkaCZN8J:scholar.google.com/&output=citation&scisdr=ClEwu4xGEIz_i9RBe8o:AFWwaeYAAAAAZ2NHY8rMyvVbiTtta4oAMCCgeKw&scisig=AFWwaeYAAAAAZ2NHY9hCxuAekf9tLmJHrGasrPE&scisf=4&ct=citation&cd=-1&hl=en",
 ]
 
+REQUIRED_STYLESHEET_HREFS = [
+    "assets/css/pixel-research-os.css",
+]
+
+REQUIRED_SCRIPT_SRCS = [
+    "assets/js/pixel-research-os.js",
+]
+
+REQUIRED_IMAGE_SRCS = [
+    "assets/img/avatar.png",
+    "assets/img/IMG_5612.jpeg",
+    "assets/img/braess_fig6.png",
+    "assets/img/comp.jpg",
+]
+
+REQUIRED_FAVICON_HREFS = [
+    "assets/img/favicon.png",
+    "assets/img/favicon-dark.png",
+]
+
 
 class StructureParser(HTMLParser):
     def __init__(self):
@@ -87,9 +99,11 @@ class StructureParser(HTMLParser):
         self.ids = set()
         self.section_ids = set()
         self.alt_texts = []
-        self.hrefs = []
-        self.srcs = []
-        self.links = set()
+        self.anchors = set()
+        self.stylesheets = set()
+        self.favicons = set()
+        self.scripts = set()
+        self.images = set()
         self.has_main = False
         self.has_nav = False
         self.has_h1 = False
@@ -104,11 +118,17 @@ class StructureParser(HTMLParser):
         if tag == "img":
             self.alt_texts.append(attrs.get("alt", ""))
             if attrs.get("src"):
-                self.add_src(attrs["src"])
-        if tag in {"a", "link"} and attrs.get("href"):
-            self.add_href(attrs["href"])
+                self.images.add(self.normalize(attrs["src"]))
+        if tag == "a" and attrs.get("href"):
+            self.anchors.add(self.normalize(attrs["href"]))
+        if tag == "link" and attrs.get("href"):
+            rel_tokens = set(self.normalize(attrs.get("rel", "")).lower().split())
+            if "stylesheet" in rel_tokens:
+                self.stylesheets.add(self.normalize(attrs["href"]))
+            if "icon" in rel_tokens:
+                self.favicons.add(self.normalize(attrs["href"]))
         if tag == "script" and attrs.get("src"):
-            self.add_src(attrs["src"])
+            self.scripts.add(self.normalize(attrs["src"]))
         if tag == "main":
             self.has_main = True
         if tag == "nav":
@@ -118,15 +138,8 @@ class StructureParser(HTMLParser):
         if tag == "button" or (tag == "a" and "button" in attrs.get("class", "")):
             self.buttons += 1
 
-    def add_href(self, value):
-        normalized = unescape(value)
-        self.hrefs.append(normalized)
-        self.links.add(normalized)
-
-    def add_src(self, value):
-        normalized = unescape(value)
-        self.srcs.append(normalized)
-        self.links.add(normalized)
+    def normalize(self, value):
+        return unescape(value)
 
 
 def fail(message):
@@ -161,9 +174,21 @@ def main():
     parser = StructureParser()
     parser.feed(html)
 
-    for link in REQUIRED_LINKS:
-        if unescape(link) not in parser.links:
-            failures.append(f"required link missing from index.html: {link}")
+    for link in REQUIRED_ANCHOR_HREFS:
+        if unescape(link) not in parser.anchors:
+            failures.append(f"required anchor href missing from index.html: {link}")
+    for link in REQUIRED_STYLESHEET_HREFS:
+        if unescape(link) not in parser.stylesheets:
+            failures.append(f"required stylesheet href missing from index.html: {link}")
+    for link in REQUIRED_SCRIPT_SRCS:
+        if unescape(link) not in parser.scripts:
+            failures.append(f"required script src missing from index.html: {link}")
+    for link in REQUIRED_IMAGE_SRCS:
+        if unescape(link) not in parser.images:
+            failures.append(f"required image src missing from index.html: {link}")
+    for link in REQUIRED_FAVICON_HREFS:
+        if unescape(link) not in parser.favicons:
+            failures.append(f"required favicon href missing from index.html: {link}")
 
     if not parser.has_main:
         failures.append("index.html needs a <main> landmark")
@@ -190,8 +215,8 @@ def main():
 
     if re.search(r"Level\s+\d+|95%|99%", html, re.IGNORECASE):
         failures.append("remove fake skill levels or gamified expertise claims")
-    blocked_markers = ("TO" + "DO", "TB" + "D", "FIX" + "ME")
-    if any(marker in html + css + js for marker in blocked_markers):
+    blocked_markers = ("to" + "do", "tb" + "d", "fix" + "me")
+    if any(marker in (html + css + js).lower() for marker in blocked_markers):
         failures.append("remove unfinished implementation markers")
 
     if failures:
