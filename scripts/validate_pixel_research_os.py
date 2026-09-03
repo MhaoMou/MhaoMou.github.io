@@ -243,7 +243,8 @@ def has_match_media_call(js):
 
 def has_fake_expertise_claim(text):
     return re.search(
-        r"(?<!\d)(?:9\d|100)%(?!\d)|"
+        r"\blevel\s+\d+\b|"
+        r"(?<!\d)(?:90|95|99)\s*(?:%|\bpercent\b)(?!\d)|"
         r"(?<!\d)(?:5\s*/\s*5|10\s*/\s*10)(?!\d)|"
         r"\bexpert\s+level\b",
         text,
@@ -273,7 +274,7 @@ def main():
 
     parser = StructureParser()
     parser.feed(html)
-    visible_text = normalize_visible_text("".join(parser.text_parts))
+    visible_text = normalize_visible_text(" ".join(parser.text_parts))
 
     for text in REQUIRED_TEXT:
         if normalize_visible_text(text) not in visible_text:
