@@ -41,9 +41,8 @@ body {
   background:
     linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
     linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
-    radial-gradient(circle at 20% 0%, rgba(196, 154, 58, 0.12), transparent 34rem),
     var(--bg);
-  background-size: 24px 24px, 24px 24px, auto, auto;
+  background-size: 24px 24px, 24px 24px, auto;
   font-family: var(--font-body);
   line-height: 1.6;
 }
@@ -291,7 +290,7 @@ h1 {
   margin: 0;
   color: var(--accent-strong);
   font-family: var(--font-pixel);
-  font-size: clamp(2rem, 7vw, 4.5rem);
+  font-size: 4rem;
   line-height: 1.1;
   letter-spacing: 0;
 }
@@ -299,7 +298,7 @@ h1 {
 .hero-role {
   margin: 0.75rem 0 0;
   color: var(--text);
-  font-size: clamp(1rem, 2vw, 1.35rem);
+  font-size: 1.25rem;
 }
 
 .hero-description {
@@ -450,10 +449,6 @@ dd {
 }
 
 @media (hover: hover) and (pointer: fine) {
-  body {
-    cursor: crosshair;
-  }
-
   a,
   button {
     cursor: pointer;
@@ -534,6 +529,10 @@ dd {
 
   h1 {
     font-size: 2rem;
+  }
+
+  .hero-role {
+    font-size: 1rem;
   }
 }
 

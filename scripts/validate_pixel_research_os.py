@@ -241,6 +241,18 @@ def has_match_media_call(js):
     return re.search(r"\bmatchMedia\s*\(", strip_js_comments(js))
 
 
+def has_viewport_scaled_font_size(css):
+    return re.search(r"font-size\s*:[^;{}]*[0-9.]\s*vw\b", strip_css_comments(css), re.IGNORECASE)
+
+
+def has_forbidden_cursor(css):
+    return re.search(r"cursor\s*:\s*crosshair\b", strip_css_comments(css), re.IGNORECASE)
+
+
+def has_forbidden_background_effect(css):
+    return re.search(r"\bradial-gradient\s*\(", strip_css_comments(css), re.IGNORECASE)
+
+
 def has_fake_expertise_claim(text):
     return re.search(
         r"\blevel\s+\d+\b|"
@@ -319,6 +331,12 @@ def main():
         failures.append("CSS must define centralized design tokens")
     if not has_match_media_call(js):
         failures.append("JS must use matchMedia for reduced-motion or responsive behavior")
+    if has_viewport_scaled_font_size(css):
+        failures.append("CSS must not scale font sizes with viewport units")
+    if has_forbidden_cursor(css):
+        failures.append("CSS must not use a crosshair cursor")
+    if has_forbidden_background_effect(css):
+        failures.append("CSS must not use radial-gradient orb effects")
 
     if has_fake_expertise_claim(visible_text):
         failures.append("remove fake skill levels or gamified expertise claims")
