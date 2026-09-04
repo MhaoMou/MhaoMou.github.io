@@ -119,6 +119,23 @@ REQUIRED_V2_CLASSES = [
 FORBIDDEN_HERO_IMAGE_SRC = "assets/img/IMG_5612.jpeg"
 ABOUT_PORTRAIT_SRC = "assets/img/IMG_5612.jpeg"
 
+VOID_ELEMENTS = {
+    "area",
+    "base",
+    "br",
+    "col",
+    "embed",
+    "hr",
+    "img",
+    "input",
+    "link",
+    "meta",
+    "param",
+    "source",
+    "track",
+    "wbr",
+}
+
 REQUIRED_EXCLUDES = [
     "legacy-index.md",
     "docs/superpowers/",
@@ -141,7 +158,7 @@ class StructureParser(HTMLParser):
         self.classes = set()
         self.hero_image_srcs = []
         self.about_image_srcs = []
-        self.section_stack = []
+        self.scope_stack = []
         self.has_main = False
         self.has_nav = False
         self.has_h1 = False
@@ -153,10 +170,10 @@ class StructureParser(HTMLParser):
             self.skip_text_depth += 1
         if attrs.get("class"):
             self.classes.update(attrs["class"].split())
-        if tag in {"section", "header", "main", "footer"}:
+        if tag not in VOID_ELEMENTS:
             explicit_scope = scope_for_attrs(attrs)
-            inherited_scope = self.section_stack[-1] if self.section_stack else ""
-            self.section_stack.append(explicit_scope or inherited_scope)
+            inherited_scope = self.scope_stack[-1] if self.scope_stack else ""
+            self.scope_stack.append(explicit_scope or inherited_scope)
         if tag == "section" and attrs.get("id"):
             self.section_ids.add(attrs["id"])
         if tag == "img":
@@ -165,7 +182,7 @@ class StructureParser(HTMLParser):
             self.image_alts.append((src, alt))
             if src:
                 self.images.add(src)
-            current_scope = self.section_stack[-1] if self.section_stack else ""
+            current_scope = scope_for_attrs(attrs) or (self.scope_stack[-1] if self.scope_stack else "")
             if current_scope == "hero" and src:
                 self.hero_image_srcs.append(src)
             if current_scope == "about" and src:
@@ -190,8 +207,8 @@ class StructureParser(HTMLParser):
     def handle_endtag(self, tag):
         if tag.lower() in {"script", "style"} and self.skip_text_depth:
             self.skip_text_depth -= 1
-        if tag.lower() in {"section", "header", "main", "footer"} and self.section_stack:
-            self.section_stack.pop()
+        if tag.lower() not in VOID_ELEMENTS and self.scope_stack:
+            self.scope_stack.pop()
 
     def handle_data(self, data):
         if not self.skip_text_depth:
@@ -294,7 +311,11 @@ def has_match_media_call(js):
 
 
 def has_viewport_scaled_font_size(css):
-    return re.search(r"font-size\s*:[^;{}]*[0-9.]\s*vw\b", strip_css_comments(css), re.IGNORECASE)
+    return re.search(
+        r"font-size\s*:[^;{}]*[0-9.]\s*(?:vw|vh|vmin|vmax)\b",
+        strip_css_comments(css),
+        re.IGNORECASE,
+    )
 
 
 def has_forbidden_cursor(css):
@@ -425,8 +446,8 @@ def main():
     if "SYSTEM LOG" not in html:
         failures.append("System Log label missing")
 
-    if re.search(r"font-size\s*:[^;{}]*[0-9.]\s*vw\b", css, re.IGNORECASE):
-        failures.append("CSS must not scale font-size with viewport width")
+    if has_viewport_scaled_font_size(css):
+        failures.append("CSS must not scale font-size with viewport units")
 
     if has_large_border_radius(css):
         failures.append("large rounded card radii are not allowed")
@@ -457,8 +478,6 @@ def main():
         failures.append("CSS must define centralized design tokens")
     if not has_match_media_call(js):
         failures.append("JS must use matchMedia for reduced-motion or responsive behavior")
-    if has_viewport_scaled_font_size(css):
-        failures.append("CSS must not scale font sizes with viewport units")
     if has_forbidden_cursor(css):
         failures.append("CSS must not use a crosshair cursor")
     if has_forbidden_background_effect(css):
