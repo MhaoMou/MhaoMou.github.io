@@ -10,6 +10,8 @@ INDEX = ROOT / "index.html"
 LEGACY_INDEX = ROOT / "index.md"
 CSS = ROOT / "assets/css/pixel-research-os.css"
 JS = ROOT / "assets/js/pixel-research-os.js"
+CONFIG = ROOT / "_config.yml"
+SITE = ROOT / "_site"
 
 LEGACY_ACC_BIBTEX_URL = (
     "https://scholar.googleusercontent.com/scholar.bib?"
@@ -98,6 +100,12 @@ REQUIRED_IMAGE_SRCS = [
 REQUIRED_FAVICON_HREFS = [
     "assets/img/favicon.png",
     "assets/img/favicon-dark.png",
+]
+
+REQUIRED_EXCLUDES = [
+    "legacy-index.md",
+    "docs/superpowers/",
+    "scripts/",
 ]
 
 
@@ -273,6 +281,8 @@ def main():
         failures.append("assets/css/pixel-research-os.css is missing")
     if not JS.exists():
         failures.append("assets/js/pixel-research-os.js is missing")
+    if not CONFIG.exists():
+        failures.append("_config.yml is missing")
     if LEGACY_INDEX.exists():
         failures.append("index.md still exists; rename it after migrating content")
 
@@ -283,6 +293,7 @@ def main():
     html = INDEX.read_text(encoding="utf-8") if INDEX.exists() else ""
     css = CSS.read_text(encoding="utf-8") if CSS.exists() else ""
     js = JS.read_text(encoding="utf-8") if JS.exists() else ""
+    config = CONFIG.read_text(encoding="utf-8") if CONFIG.exists() else ""
 
     parser = StructureParser()
     parser.feed(html)
@@ -343,6 +354,18 @@ def main():
     blocked_markers = ("to" + "do", "tb" + "d", "fix" + "me")
     if any(marker in (html + css + js).lower() for marker in blocked_markers):
         failures.append("remove unfinished implementation markers")
+    for excluded_path in REQUIRED_EXCLUDES:
+        if f"- {excluded_path}" not in config:
+            failures.append(f"_config.yml must exclude implementation-only path: {excluded_path}")
+    if SITE.exists():
+        forbidden_outputs = [
+            SITE / "legacy-index.html",
+            SITE / "docs/superpowers",
+            SITE / "scripts/validate_pixel_research_os.py",
+        ]
+        for path in forbidden_outputs:
+            if path.exists():
+                failures.append(f"Jekyll output should not publish implementation artifact: {path.relative_to(ROOT)}")
 
     if failures:
         for item in failures:

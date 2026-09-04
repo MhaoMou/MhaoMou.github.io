@@ -60,3 +60,8 @@ exclude:
   - LICENSE
   - minimal-light.gemspec
   - html_source_file/
+  - legacy-index.md
+  - docs/superpowers/
+  - scripts/
+  - .superpowers/
+  - .worktrees/
