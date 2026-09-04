@@ -153,8 +153,8 @@ class StructureParser(HTMLParser):
             self.skip_text_depth += 1
         if attrs.get("class"):
             self.classes.update(attrs["class"].split())
-        if tag in {"section", "header", "main", "footer"} and attrs.get("id"):
-            self.section_stack.append(attrs["id"])
+        if tag in {"section", "header", "main", "footer"}:
+            self.section_stack.append(scope_for_attrs(attrs))
         if tag == "section" and attrs.get("id"):
             self.section_ids.add(attrs["id"])
         if tag == "img":
@@ -197,6 +197,16 @@ class StructureParser(HTMLParser):
 
     def normalize(self, value):
         return unescape(value)
+
+
+def scope_for_attrs(attrs):
+    element_id = attrs.get("id") or ""
+    class_tokens = set((attrs.get("class") or "").split())
+    if element_id in {"hero", "about"}:
+        return element_id
+    if "hero-desktop" in class_tokens:
+        return "hero"
+    return ""
 
 
 def normalize_visible_text(value):
@@ -293,6 +303,52 @@ def has_forbidden_background_effect(css):
     return re.search(r"\bradial-gradient\s*\(", strip_css_comments(css), re.IGNORECASE)
 
 
+def has_large_border_radius(css):
+    uncommented_css = strip_css_comments(css)
+    border_radius_values = re.findall(
+        r"\bborder(?:-[a-z]+)*-radius\s*:\s*([^;{}]+)",
+        uncommented_css,
+        re.IGNORECASE,
+    )
+
+    for value in border_radius_values:
+        if re.search(r"\b(?:var|calc)\s*\(", value, re.IGNORECASE):
+            return True
+        for number, unit in re.findall(
+            r"(-?(?:\d+|\d*\.\d+))\s*(px|%|rem|em)\b",
+            value,
+            re.IGNORECASE,
+        ):
+            radius = float(number)
+            normalized_unit = unit.lower()
+            if normalized_unit == "px" and radius > 9:
+                return True
+            if normalized_unit in {"%", "rem", "em"} and radius != 0:
+                return True
+
+    return False
+
+
+def has_soft_visual_effect(css):
+    uncommented_css = strip_css_comments(css)
+    if re.search(r"\bbackdrop-filter\s*:", uncommented_css, re.IGNORECASE):
+        return True
+    if re.search(r"(?<!-)filter\s*:[^;{}]*\bblur\s*\(", uncommented_css, re.IGNORECASE):
+        return True
+
+    box_shadow_values = re.findall(
+        r"\bbox-shadow\s*:\s*([^;{}]+)",
+        uncommented_css,
+        re.IGNORECASE,
+    )
+    for value in box_shadow_values:
+        for length in re.findall(r"(-?(?:\d+|\d*\.\d+))\s*px\b", value, re.IGNORECASE):
+            if float(length) >= 16:
+                return True
+
+    return False
+
+
 def has_fake_expertise_claim(text):
     return re.search(
         r"\blevel\s+\d+\b|"
@@ -370,14 +426,10 @@ def main():
     if re.search(r"font-size\s*:[^;{}]*[0-9.]\s*vw\b", css, re.IGNORECASE):
         failures.append("CSS must not scale font-size with viewport width")
 
-    if re.search(r"border-radius\s*:\s*(1[0-9]|[2-9][0-9])px", css, re.IGNORECASE):
+    if has_large_border_radius(css):
         failures.append("large rounded card radii are not allowed")
 
-    if re.search(
-        r"\b(backdrop-filter|filter\s*:\s*blur|box-shadow\s*:[^;]*rgba\([^)]*,\s*0\.[0-9]+\)[^;]*[1-9][0-9]px)",
-        css,
-        re.IGNORECASE,
-    ):
+    if has_soft_visual_effect(css):
         failures.append("blur/glass/soft-shadow visual effects are not allowed")
 
     if not parser.has_main:
