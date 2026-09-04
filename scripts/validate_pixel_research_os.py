@@ -101,6 +101,24 @@ REQUIRED_FAVICON_HREFS = [
     "assets/img/favicon-dark.png",
 ]
 
+REQUIRED_V2_CLASSES = [
+    "desktop-shell",
+    "desktop-titlebar",
+    "desktop-workspace",
+    "hero-desktop",
+    "lab-console",
+    "identity-panel",
+    "desktop-taskbar",
+    "command-center",
+    "research-module",
+    "paper-record",
+    "system-log",
+    "terminal-panel",
+]
+
+FORBIDDEN_HERO_IMAGE_SRC = "assets/img/IMG_5612.jpeg"
+ABOUT_PORTRAIT_SRC = "assets/img/IMG_5612.jpeg"
+
 REQUIRED_EXCLUDES = [
     "legacy-index.md",
     "docs/superpowers/",
@@ -120,6 +138,10 @@ class StructureParser(HTMLParser):
         self.favicons = set()
         self.scripts = set()
         self.images = set()
+        self.classes = set()
+        self.hero_image_srcs = []
+        self.about_image_srcs = []
+        self.section_stack = []
         self.has_main = False
         self.has_nav = False
         self.has_h1 = False
@@ -129,6 +151,10 @@ class StructureParser(HTMLParser):
         attrs = dict(attrs)
         if tag in {"script", "style"}:
             self.skip_text_depth += 1
+        if attrs.get("class"):
+            self.classes.update(attrs["class"].split())
+        if tag in {"section", "header", "main", "footer"} and attrs.get("id"):
+            self.section_stack.append(attrs["id"])
         if tag == "section" and attrs.get("id"):
             self.section_ids.add(attrs["id"])
         if tag == "img":
@@ -137,6 +163,11 @@ class StructureParser(HTMLParser):
             self.image_alts.append((src, alt))
             if src:
                 self.images.add(src)
+            current_scope = self.section_stack[-1] if self.section_stack else ""
+            if current_scope == "hero" and src:
+                self.hero_image_srcs.append(src)
+            if current_scope == "about" and src:
+                self.about_image_srcs.append(src)
         if tag == "a" and attrs.get("href"):
             self.anchors.add(self.normalize(attrs["href"]))
         if tag == "link" and attrs.get("href"):
@@ -157,6 +188,8 @@ class StructureParser(HTMLParser):
     def handle_endtag(self, tag):
         if tag.lower() in {"script", "style"} and self.skip_text_depth:
             self.skip_text_depth -= 1
+        if tag.lower() in {"section", "header", "main", "footer"} and self.section_stack:
+            self.section_stack.pop()
 
     def handle_data(self, data):
         if not self.skip_text_depth:
@@ -260,13 +293,6 @@ def has_forbidden_background_effect(css):
     return re.search(r"\bradial-gradient\s*\(", strip_css_comments(css), re.IGNORECASE)
 
 
-def hero_uses_real_portrait(html):
-    return re.search(
-        r'<div\s+class="pixel-avatar"[^>]*>\s*<img\s+[^>]*src="assets/img/IMG_5612\.jpeg"',
-        html,
-    )
-
-
 def has_fake_expertise_claim(text):
     return re.search(
         r"\blevel\s+\d+\b|"
@@ -324,8 +350,35 @@ def main():
     for link in REQUIRED_FAVICON_HREFS:
         if unescape(link) not in parser.favicons:
             failures.append(f"required favicon href missing from index.html: {link}")
-    if not hero_uses_real_portrait(html):
-        failures.append("hero profile image must use assets/img/IMG_5612.jpeg")
+
+    for class_name in REQUIRED_V2_CLASSES:
+        if class_name not in parser.classes:
+            failures.append(f"required v2 class missing from index.html: {class_name}")
+
+    if FORBIDDEN_HERO_IMAGE_SRC in parser.hero_image_srcs:
+        failures.append("hero must use illustrated lab/console art, not the real portrait")
+
+    if ABOUT_PORTRAIT_SRC not in parser.about_image_srcs:
+        failures.append("ABOUT.EXE must contain the real portrait image")
+
+    if "PAPER_DATABASE" not in html and "PAPER DATABASE" not in html:
+        failures.append("Paper Database label missing")
+
+    if "SYSTEM LOG" not in html:
+        failures.append("System Log label missing")
+
+    if re.search(r"font-size\s*:[^;{}]*[0-9.]\s*vw\b", css, re.IGNORECASE):
+        failures.append("CSS must not scale font-size with viewport width")
+
+    if re.search(r"border-radius\s*:\s*(1[0-9]|[2-9][0-9])px", css, re.IGNORECASE):
+        failures.append("large rounded card radii are not allowed")
+
+    if re.search(
+        r"\b(backdrop-filter|filter\s*:\s*blur|box-shadow\s*:[^;]*rgba\([^)]*,\s*0\.[0-9]+\)[^;]*[1-9][0-9]px)",
+        css,
+        re.IGNORECASE,
+    ):
+        failures.append("blur/glass/soft-shadow visual effects are not allowed")
 
     if not parser.has_main:
         failures.append("index.html needs a <main> landmark")
