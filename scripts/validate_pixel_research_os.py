@@ -372,6 +372,14 @@ def has_soft_visual_effect(css):
     return False
 
 
+def has_paper_database_label(text):
+    return "PAPER_DATABASE" in text or "PAPER DATABASE" in text
+
+
+def has_system_log_label(text):
+    return "SYSTEM LOG" in text
+
+
 def has_fake_expertise_claim(text):
     return re.search(
         r"\blevel\s+\d+\b|"
@@ -440,10 +448,10 @@ def main():
     if ABOUT_PORTRAIT_SRC not in parser.about_image_srcs:
         failures.append("ABOUT.EXE must contain the real portrait image")
 
-    if "PAPER_DATABASE" not in html and "PAPER DATABASE" not in html:
+    if not has_paper_database_label(visible_text):
         failures.append("Paper Database label missing")
 
-    if "SYSTEM LOG" not in html:
+    if not has_system_log_label(visible_text):
         failures.append("System Log label missing")
 
     if has_viewport_scaled_font_size(css):
