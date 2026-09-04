@@ -154,7 +154,9 @@ class StructureParser(HTMLParser):
         if attrs.get("class"):
             self.classes.update(attrs["class"].split())
         if tag in {"section", "header", "main", "footer"}:
-            self.section_stack.append(scope_for_attrs(attrs))
+            explicit_scope = scope_for_attrs(attrs)
+            inherited_scope = self.section_stack[-1] if self.section_stack else ""
+            self.section_stack.append(explicit_scope or inherited_scope)
         if tag == "section" and attrs.get("id"):
             self.section_ids.add(attrs["id"])
         if tag == "img":
