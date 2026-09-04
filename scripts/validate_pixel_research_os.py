@@ -136,6 +136,8 @@ VOID_ELEMENTS = {
     "wbr",
 }
 
+NON_RENDERED_TAGS = {"script", "style", "template"}
+
 REQUIRED_EXCLUDES = [
     "legacy-index.md",
     "docs/superpowers/",
@@ -159,6 +161,7 @@ class StructureParser(HTMLParser):
         self.hero_image_srcs = []
         self.about_image_srcs = []
         self.scope_stack = []
+        self.nonrendered_stack = []
         self.has_main = False
         self.has_nav = False
         self.has_h1 = False
@@ -166,11 +169,13 @@ class StructureParser(HTMLParser):
     def handle_starttag(self, tag, attrs):
         tag = tag.lower()
         attrs = dict(attrs)
-        if tag in {"script", "style"}:
-            self.skip_text_depth += 1
         if attrs.get("class"):
             self.classes.update(attrs["class"].split())
         if tag not in VOID_ELEMENTS:
+            starts_nonrendered = tag in NON_RENDERED_TAGS or "hidden" in attrs
+            if starts_nonrendered:
+                self.skip_text_depth += 1
+            self.nonrendered_stack.append(starts_nonrendered)
             explicit_scope = scope_for_attrs(attrs)
             inherited_scope = self.scope_stack[-1] if self.scope_stack else ""
             self.scope_stack.append(explicit_scope or inherited_scope)
@@ -205,10 +210,12 @@ class StructureParser(HTMLParser):
             self.has_h1 = True
 
     def handle_endtag(self, tag):
-        if tag.lower() in {"script", "style"} and self.skip_text_depth:
-            self.skip_text_depth -= 1
-        if tag.lower() not in VOID_ELEMENTS and self.scope_stack:
+        tag = tag.lower()
+        if tag not in VOID_ELEMENTS and self.scope_stack:
             self.scope_stack.pop()
+        if tag not in VOID_ELEMENTS and self.nonrendered_stack:
+            if self.nonrendered_stack.pop() and self.skip_text_depth:
+                self.skip_text_depth -= 1
 
     def handle_data(self, data):
         if not self.skip_text_depth:
@@ -312,7 +319,7 @@ def has_match_media_call(js):
 
 def has_viewport_scaled_font_size(css):
     return re.search(
-        r"font-size\s*:[^;{}]*[0-9.]\s*(?:vw|vh|vmin|vmax)\b",
+        r"\bfont(?:-size)?\s*:[^;{}]*[0-9.]\s*(?:vw|vh|vmin|vmax)\b",
         strip_css_comments(css),
         re.IGNORECASE,
     )
