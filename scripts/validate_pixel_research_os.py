@@ -91,7 +91,6 @@ REQUIRED_SCRIPT_SRCS = [
 ]
 
 REQUIRED_IMAGE_SRCS = [
-    "assets/img/avatar.png",
     "assets/img/IMG_5612.jpeg",
     "assets/img/braess_fig6.png",
     "assets/img/comp.jpg",
@@ -261,6 +260,13 @@ def has_forbidden_background_effect(css):
     return re.search(r"\bradial-gradient\s*\(", strip_css_comments(css), re.IGNORECASE)
 
 
+def hero_uses_real_portrait(html):
+    return re.search(
+        r'<div\s+class="pixel-avatar"[^>]*>\s*<img\s+[^>]*src="assets/img/IMG_5612\.jpeg"',
+        html,
+    )
+
+
 def has_fake_expertise_claim(text):
     return re.search(
         r"\blevel\s+\d+\b|"
@@ -318,6 +324,8 @@ def main():
     for link in REQUIRED_FAVICON_HREFS:
         if unescape(link) not in parser.favicons:
             failures.append(f"required favicon href missing from index.html: {link}")
+    if not hero_uses_real_portrait(html):
+        failures.append("hero profile image must use assets/img/IMG_5612.jpeg")
 
     if not parser.has_main:
         failures.append("index.html needs a <main> landmark")
