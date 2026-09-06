@@ -333,6 +333,50 @@ def has_forbidden_background_effect(css):
     return re.search(r"\bradial-gradient\s*\(", strip_css_comments(css), re.IGNORECASE)
 
 
+def extract_first_css_block(css, at_rule_pattern):
+    uncommented_css = strip_css_comments(css)
+    match = re.search(at_rule_pattern, uncommented_css, re.IGNORECASE)
+    if not match:
+        return ""
+
+    open_brace = uncommented_css.find("{", match.end() - 1)
+    if open_brace == -1:
+        return ""
+
+    depth = 0
+    for index in range(open_brace, len(uncommented_css)):
+        if uncommented_css[index] == "{":
+            depth += 1
+        elif uncommented_css[index] == "}":
+            depth -= 1
+            if depth == 0:
+                return uncommented_css[open_brace + 1:index]
+
+    return ""
+
+
+def rule_has_declaration(css, selector, declaration):
+    for rule_match in re.finditer(r"([^{}]+)\{([^{}]+)\}", css):
+        selectors = [part.strip() for part in rule_match.group(1).split(",")]
+        if not any(re.search(selector, item) for item in selectors):
+            continue
+        if re.search(declaration, rule_match.group(2), re.IGNORECASE):
+            return True
+    return False
+
+
+def has_mobile_overflow_guards(css):
+    mobile_css = extract_first_css_block(css, r"@media[^{]*max-width\s*:\s*640px[^{]*")
+    return (
+        rule_has_declaration(mobile_css, r"\.desktop-nav\b", r"\bdisplay\s*:\s*none\b")
+        and rule_has_declaration(mobile_css, r"\.hero-actions\b", r"\bgrid-template-columns\s*:\s*1fr\b")
+        and rule_has_declaration(mobile_css, r"\.hero-actions\s+a\b", r"\bmin-width\s*:\s*0\b")
+        and rule_has_declaration(css, r"\.desktop-shell\b", r"\bmin-width\s*:\s*0\b")
+        and rule_has_declaration(css, r"\.desktop-workspace\b", r"\bmin-width\s*:\s*0\b")
+        and rule_has_declaration(css, r"\.pixel-window\b", r"\bmax-width\s*:\s*100%(?:\s|;|$)")
+    )
+
+
 def has_large_border_radius(css):
     uncommented_css = strip_css_comments(css)
     border_radius_values = re.findall(
@@ -497,6 +541,8 @@ def main():
         failures.append("CSS must not use a crosshair cursor")
     if has_forbidden_background_effect(css):
         failures.append("CSS must not use radial-gradient orb effects")
+    if not has_mobile_overflow_guards(css):
+        failures.append("mobile breakpoint must prevent titlebar/hero action overflow")
 
     if has_fake_expertise_claim(visible_text):
         failures.append("remove fake skill levels or gamified expertise claims")
