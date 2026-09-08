@@ -1,0 +1,33 @@
+type = "card"
+title = "Research"
+description = "Research themes and current project directions."
+
+[[items]]
+title = "Coupled Energy Infrastructure Systems"
+content = "Modeling and analysis for infrastructure systems that connect energy, transportation, and decision-making layers."
+tags = ["energy", "transportation", "infrastructure"]
+link = "/publications"
+
+[[items]]
+title = "Generative Models"
+content = "Learning-based models for representing complex system behavior and supporting research workflows."
+tags = ["generative models", "learning", "systems"]
+link = "/publications"
+
+[[items]]
+title = "Optimal Control"
+content = "Optimization and control methods for engineered systems with operational constraints."
+tags = ["optimization", "control", "operations"]
+link = "/publications"
+
+[[items]]
+title = "Power and Transportation Coupling"
+content = "Research on Braess-type phenomena in coupled power and transportation systems."
+tags = ["power systems", "transportation", "Braess paradox"]
+link = "https://arxiv.org/abs/2512.12197"
+
+[[items]]
+title = "Workplace EV Charging"
+content = "Pricing and operational design for workplace electric vehicle charging."
+tags = ["EV charging", "pricing", "operations"]
+link = "https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=10644866"

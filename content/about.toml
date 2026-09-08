@@ -3,9 +3,9 @@ title = "About"
 
 [profile]
 research_interests = [
-  "Computational Physics",
-  "Mathematical Principles",
-  "Proof of Theorems"
+  "Coupled Energy Infrastructure Systems",
+  "Generative Models",
+  "Optimal Control"
 ]
 
 [[sections]]
@@ -26,4 +26,3 @@ id = "news"
 type = "list"
 title = "News"
 source = "news.toml"
-
