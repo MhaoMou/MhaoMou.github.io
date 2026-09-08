@@ -72,9 +72,13 @@ REQUIRED_TEXT = {
     "content/publications.bib": [
         "Braess' Paradoxes in Coupled Power and Transportation Systems",
         "Nexus Cognizant Pricing of Workplace Electric Vehicle Charging",
+        "Propelling DNA-Based Archival Storage With an Algorithmic Mindset",
         "Mou, Minghao",
+        "Yang, Yaoyu",
+        "Wei, Wei",
         "Qian, Sean",
         "Qin, Junjie",
+        "10.1109/TMBMC.2026.3694522",
         "selected = {true}",
         "preview = {braess_fig6.png}",
         "preview = {comp.jpg}",
@@ -196,6 +200,7 @@ def main() -> int:
             "Ph.D. candidate",
             "Selected Publications",
             "Coupled Energy Infrastructure Systems",
+            "Propelling DNA-Based Archival Storage With an Algorithmic Mindset",
         ]:
             if snippet not in output:
                 failures.append(f"generated homepage missing required text: {snippet}")
