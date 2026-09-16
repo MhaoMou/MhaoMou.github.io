@@ -28,7 +28,7 @@ export default function BlogPostPage({ post, content }: BlogPostPageProps) {
         <h1 className="text-4xl font-serif font-bold text-primary mb-4">{post.title}</h1>
         <p className="text-lg text-neutral-600 dark:text-neutral-500">{post.summary}</p>
       </header>
-      <div className="text-neutral-700 dark:text-neutral-600 leading-relaxed">
+      <div className="text-neutral-700 dark:text-neutral-600 leading-relaxed overflow-hidden [&_.katex-display]:max-w-full [&_.katex-display]:overflow-x-auto [&_.katex-display]:overflow-y-hidden [&_.katex-display]:py-2 [&_.katex-display]:my-4">
         <ReactMarkdown
           remarkPlugins={[remarkMath]}
           rehypePlugins={[rehypeKatex]}

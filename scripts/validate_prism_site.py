@@ -229,6 +229,25 @@ def main() -> int:
     if "push:" not in workflow or "branches:" not in workflow or "- main" not in workflow:
         failures.append("GitHub Pages workflow must deploy on pushes to main")
 
+    blog_post = ROOT / "content" / "blog" / "multi-parametric-nonlinear-program.md"
+    if blog_post.exists():
+        in_display_math = False
+        for line_no, line in enumerate(blog_post.read_text(encoding="utf-8").splitlines(), 1):
+            if "$$" in line and line.strip() != "$$":
+                failures.append(
+                    "display math delimiter must be on its own line in "
+                    f"content/blog/multi-parametric-nonlinear-program.md:{line_no}"
+                )
+            if line.strip() == "$$":
+                in_display_math = not in_display_math
+            elif in_display_math and re.match(r"\s*#{1,6}\s+", line):
+                failures.append(
+                    "markdown heading appears inside an open display math block in "
+                    f"content/blog/multi-parametric-nonlinear-program.md:{line_no}"
+                )
+        if in_display_math:
+            failures.append("display math delimiters must be balanced in content/blog/multi-parametric-nonlinear-program.md")
+
     out_index = ROOT / "out" / "index.html"
     if out_index.exists():
         output = out_index.read_text(encoding="utf-8", errors="replace")
@@ -277,6 +296,24 @@ def main() -> int:
         if re.search(r">\s*News\s*<", output):
             print("FAIL: generated homepage should not render the full News heading")
             return 1
+
+    out_blog = ROOT / "out" / "blog" / "multi-parametric-nonlinear-program" / "index.html"
+    if out_blog.exists():
+        output = out_blog.read_text(encoding="utf-8", errors="replace")
+        rendered_output = re.sub(r"<script\b[^>]*>.*?</script>", "", output, flags=re.IGNORECASE | re.DOTALL)
+        for snippet in [
+            "Multi-Parametric Nonlinear Program",
+            "Karush-Kuhn-Tucker",
+            "Mangasarian-Fromovitz",
+            "katex",
+        ]:
+            if snippet not in rendered_output:
+                print(f"FAIL: generated blog post missing required rendered text: {snippet}")
+                return 1
+        for artifact in ["$$", "eq:", "thm:", "###", "katex-error"]:
+            if artifact in rendered_output:
+                print(f"FAIL: generated blog post contains raw rendering artifact: {artifact}")
+                return 1
 
     print("PASS: PRISM site validation")
     return 0
