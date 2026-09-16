@@ -16,7 +16,7 @@ REQUIRED_FILES = [
     "content/publications.bib",
     "content/publications.toml",
     "content/blog.toml",
-    "content/blog/learning-to-optimize.md",
+    "content/blog/multi-parametric-nonlinear-program.md",
     "content/research.toml",
     "content/cv.toml",
     "content/cv.md",
@@ -64,16 +64,27 @@ REQUIRED_TEXT = {
         "news.toml",
         'type = "latest_updates"',
         'type = "scholar_card"',
+        'total_citations = 3',
+        'h_index = 1',
+        'i10_index = 0',
+        'last_checked = "September 16, 2026"',
+        'year = "2025"',
+        'citations = 3',
     ],
     "content/blog.toml": [
         'type = "blog"',
         'title = "Blog"',
-        "learning-to-optimize",
-        "Learning to Optimize",
+        "multi-parametric-nonlinear-program",
+        "Multi-Parametric Nonlinear Program",
     ],
-    "content/blog/learning-to-optimize.md": [
-        "Learning to Optimize",
-        "optimization",
+    "content/blog/multi-parametric-nonlinear-program.md": [
+        "multi-parametric nonlinear programs",
+        "Karush-Kuhn-Tucker",
+        "Mangasarian-Fromovitz",
+        "Differential Stability",
+        "Sensitivity Analysis",
+        "Anthony V. Fiacco",
+        "Daniel Ralph",
     ],
     "content/news.toml": [
         "May 2026",
@@ -133,6 +144,7 @@ FORBIDDEN_SOURCE_PATHS = [
     "Gemfile",
     "assets/css/pixel-research-os.css",
     "assets/js/pixel-research-os.js",
+    "content/blog/learning-to-optimize.md",
 ]
 
 FORBIDDEN_TEXT_BY_GLOB = {
@@ -155,6 +167,8 @@ FORBIDDEN_OUTPUT_TEXT = [
     "Pixel Research OS",
     "Jiale Liu",
     "University of Example",
+    "Learning to Optimize",
+    "/blog/learning-to-optimize",
 ]
 
 
@@ -240,6 +254,29 @@ def main() -> int:
         for item in failures:
             print(f"FAIL: {item}")
         return 1
+
+    about = read("content/about.toml") if (ROOT / "content/about.toml").exists() else ""
+    if re.search(r'id\s*=\s*"news"\s*\n\s*type\s*=\s*"list"', about):
+        print('FAIL: full News list section should be hidden from content/about.toml')
+        return 1
+
+    if out_index.exists():
+        output = out_index.read_text(encoding="utf-8", errors="replace")
+        for snippet in [
+            'total_citations\\":3',
+            "citations",
+            "h-index",
+            "i10-index",
+            "Citation trend",
+            "Last checked",
+            "September 16, 2026",
+        ]:
+            if snippet not in output:
+                print(f"FAIL: generated homepage missing Scholar metric text: {snippet}")
+                return 1
+        if re.search(r">\s*News\s*<", output):
+            print("FAIL: generated homepage should not render the full News heading")
+            return 1
 
     print("PASS: PRISM site validation")
     return 0

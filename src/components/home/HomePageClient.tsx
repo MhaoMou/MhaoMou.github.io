@@ -26,6 +26,16 @@ interface SectionConfig {
   publications?: Publication[];
   items?: NewsItem[];
   scholarUrl?: string;
+  total_citations?: number;
+  h_index?: number;
+  i10_index?: number;
+  last_checked?: string;
+  trend?: ScholarTrendPoint[];
+}
+
+interface ScholarTrendPoint {
+  year: string;
+  citations: number;
 }
 
 type PageData =
@@ -114,6 +124,11 @@ export default function HomePageClient({ dataByLocale, defaultLocale }: HomePage
                         href={section.scholarUrl}
                         title={section.title}
                         description={section.description}
+                        totalCitations={section.total_citations}
+                        hIndex={section.h_index}
+                        i10Index={section.i10_index}
+                        lastChecked={section.last_checked}
+                        trend={section.trend}
                       />
                     );
                   default:

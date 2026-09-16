@@ -3,6 +3,8 @@
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
 import { BlogPostMeta } from '@/types/page';
 
 interface BlogPostPageProps {
@@ -16,7 +18,7 @@ export default function BlogPostPage({ post, content }: BlogPostPageProps) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, delay: 0.2 }}
-      className="max-w-3xl mx-auto"
+      className="max-w-4xl mx-auto"
     >
       <Link href="/blog" className="text-sm font-medium text-accent hover:bg-accent/10 rounded">
         Back to Blog
@@ -28,14 +30,21 @@ export default function BlogPostPage({ post, content }: BlogPostPageProps) {
       </header>
       <div className="text-neutral-700 dark:text-neutral-600 leading-relaxed">
         <ReactMarkdown
+          remarkPlugins={[remarkMath]}
+          rehypePlugins={[rehypeKatex]}
           components={{
             h1: ({ children }) => <h1 className="text-3xl font-serif font-bold text-primary mt-8 mb-4">{children}</h1>,
             h2: ({ children }) => <h2 className="text-2xl font-serif font-bold text-primary mt-8 mb-4 border-b border-neutral-200 dark:border-neutral-800 pb-2">{children}</h2>,
             h3: ({ children }) => <h3 className="text-xl font-semibold text-primary mt-6 mb-3">{children}</h3>,
-            p: ({ children }) => <p className="mb-4 last:mb-0">{children}</p>,
+            p: ({ children }) => <p className="mb-4 last:mb-0 overflow-x-auto">{children}</p>,
             ul: ({ children }) => <ul className="list-disc list-inside mb-4 space-y-1 ml-4">{children}</ul>,
             ol: ({ children }) => <ol className="list-decimal list-inside mb-4 space-y-1 ml-4">{children}</ol>,
             li: ({ children }) => <li className="mb-1">{children}</li>,
+            code: ({ children, className }) => (
+              <code className={className ? `${className} text-sm` : 'rounded bg-neutral-100 dark:bg-neutral-800 px-1 py-0.5 text-sm'}>
+                {children}
+              </code>
+            ),
             a: ({ ...props }) => (
               <a
                 {...props}

@@ -18,11 +18,21 @@ interface SectionConfig {
   publications?: Publication[];
   items?: NewsItem[];
   scholarUrl?: string;
+  total_citations?: number;
+  h_index?: number;
+  i10_index?: number;
+  last_checked?: string;
+  trend?: ScholarTrendPoint[];
 }
 
 interface NewsItem {
   date: string;
   content: string;
+}
+
+interface ScholarTrendPoint {
+  year: string;
+  citations: number;
 }
 
 type PageData =

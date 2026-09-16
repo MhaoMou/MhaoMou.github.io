@@ -23,12 +23,6 @@ filter = "selected"
 limit = 5
 
 [[sections]]
-id = "news"
-type = "list"
-title = "News"
-source = "news.toml"
-
-[[sections]]
 id = "latest_updates_widget"
 type = "latest_updates"
 title = "Latest Updates"
@@ -39,4 +33,11 @@ limit = 3
 id = "scholar_widget"
 type = "scholar_card"
 title = "Google Scholar"
-description = "Publication profile and citation record."
+description = "Citation profile and publication impact."
+total_citations = 3
+h_index = 1
+i10_index = 0
+last_checked = "September 16, 2026"
+trend = [
+  { year = "2025", citations = 3 }
+]
