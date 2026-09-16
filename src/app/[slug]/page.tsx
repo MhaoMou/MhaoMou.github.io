@@ -8,6 +8,7 @@ import {
   PublicationPageConfig,
   TextPageConfig,
   CardPageConfig,
+  BlogPageConfig,
 } from '@/types/page';
 
 import { Metadata } from 'next';
@@ -44,6 +45,13 @@ function loadDynamicPageData(slug: string, locale?: string): DynamicPageLocaleDa
     return {
       type: 'card',
       config: pageConfig as CardPageConfig,
+    };
+  }
+
+  if (pageConfig.type === 'blog') {
+    return {
+      type: 'blog',
+      config: pageConfig as BlogPageConfig,
     };
   }
 

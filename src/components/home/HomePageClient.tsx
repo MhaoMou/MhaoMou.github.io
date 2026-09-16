@@ -4,6 +4,8 @@ import Profile from '@/components/home/Profile';
 import About from '@/components/home/About';
 import SelectedPublications from '@/components/home/SelectedPublications';
 import News, { NewsItem } from '@/components/home/News';
+import LatestUpdatesWidget from '@/components/home/LatestUpdatesWidget';
+import ScholarWidget from '@/components/home/ScholarWidget';
 import PublicationsList from '@/components/publications/PublicationsList';
 import TextPage from '@/components/pages/TextPage';
 import CardPage from '@/components/pages/CardPage';
@@ -14,14 +16,16 @@ import { useLocaleStore } from '@/lib/stores/localeStore';
 
 interface SectionConfig {
   id: string;
-  type: 'markdown' | 'publications' | 'list';
+  type: 'markdown' | 'publications' | 'list' | 'latest_updates' | 'scholar_card';
   title?: string;
+  description?: string;
   source?: string;
   filter?: string;
   limit?: number;
   content?: string;
   publications?: Publication[];
   items?: NewsItem[];
+  scholarUrl?: string;
 }
 
 type PageData =
@@ -93,6 +97,23 @@ export default function HomePageClient({ dataByLocale, defaultLocale }: HomePage
                         key={section.id}
                         items={section.items || []}
                         title={section.title}
+                      />
+                    );
+                  case 'latest_updates':
+                    return (
+                      <LatestUpdatesWidget
+                        key={section.id}
+                        items={section.items || []}
+                        title={section.title}
+                      />
+                    );
+                  case 'scholar_card':
+                    return (
+                      <ScholarWidget
+                        key={section.id}
+                        href={section.scholarUrl}
+                        title={section.title}
+                        description={section.description}
                       />
                     );
                   default:

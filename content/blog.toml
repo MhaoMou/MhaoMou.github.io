@@ -1,0 +1,11 @@
+type = "blog"
+title = "Blog"
+description = "Notes on research, optimization, energy systems, and academic life."
+
+[[posts]]
+slug = "learning-to-optimize"
+title = "Learning to Optimize"
+date = "2026-09-16"
+summary = "A working note on optimization as a way to think about models, infrastructure, and decision-making."
+tags = ["Optimization", "Research", "Learning"]
+source = "blog/learning-to-optimize.md"

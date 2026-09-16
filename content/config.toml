@@ -7,7 +7,7 @@ last_updated = "September 2026"
 [author]
 name = "Minghao Mou"
 title = "Ph.D. candidate"
-institution = "Elmore Family School of Electrical and Computer Engineering, Purdue University"
+institution = "Purdue ECE"
 avatar = "/bio.jpg"
 
 [social]
@@ -15,7 +15,7 @@ email = "mmou@purdue.edu"
 location = "West Lafayette, Indiana"
 location_url = "https://www.purdue.edu/"
 location_details = [
-  "Elmore Family School of Electrical and Computer Engineering,",
+  "Purdue ECE,",
   "Purdue University"
 ]
 google_scholar = "https://scholar.google.com/citations?user=lDU4ZtQAAAAJ&hl=en"
@@ -56,6 +56,12 @@ title = "Research"
 type = "page"
 target = "research"
 href = "/research"
+
+[[navigation]]
+title = "Blog"
+type = "page"
+target = "blog"
+href = "/blog"
 
 [[navigation]]
 title = "CV"

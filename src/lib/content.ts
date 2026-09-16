@@ -46,6 +46,10 @@ export function getMarkdownContent(filename: string, locale?: string): string {
   return readFirstAvailableFile(filename, locale);
 }
 
+export function getBlogMarkdownContent(filename: string, locale?: string): string {
+  return readFirstAvailableFile(filename, locale);
+}
+
 export function getBibtexContent(filename: string, locale?: string): string {
   return readFirstAvailableFile(filename, locale);
 }

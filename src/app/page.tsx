@@ -8,14 +8,16 @@ import { getRuntimeI18nConfig } from '@/lib/i18n/config';
 
 interface SectionConfig {
   id: string;
-  type: 'markdown' | 'publications' | 'list';
+  type: 'markdown' | 'publications' | 'list' | 'latest_updates' | 'scholar_card';
   title?: string;
+  description?: string;
   source?: string;
   filter?: string;
   limit?: number;
   content?: string;
   publications?: Publication[];
   items?: NewsItem[];
+  scholarUrl?: string;
 }
 
 interface NewsItem {
@@ -55,6 +57,18 @@ function processSections(sections: SectionConfig[], locale?: string): SectionCon
           items: newsData?.news || [],
         };
       }
+      case 'latest_updates': {
+        const newsData = section.source ? getTomlContent<{ news: NewsItem[] }>(section.source, locale) : null;
+        return {
+          ...section,
+          items: (newsData?.news || []).slice(0, section.limit || 3),
+        };
+      }
+      case 'scholar_card':
+        return {
+          ...section,
+          scholarUrl: getConfig(locale).social.google_scholar,
+        };
       default:
         return section;
     }

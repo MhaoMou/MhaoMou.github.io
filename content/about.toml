@@ -5,7 +5,8 @@ title = "About"
 research_interests = [
   "Coupled Energy Infrastructure Systems",
   "Generative Models",
-  "Optimal Control"
+  "Optimal Control",
+  "Learn to Optimize"
 ]
 
 [[sections]]
@@ -26,3 +27,16 @@ id = "news"
 type = "list"
 title = "News"
 source = "news.toml"
+
+[[sections]]
+id = "latest_updates_widget"
+type = "latest_updates"
+title = "Latest Updates"
+source = "news.toml"
+limit = 3
+
+[[sections]]
+id = "scholar_widget"
+type = "scholar_card"
+title = "Google Scholar"
+description = "Publication profile and citation record."
