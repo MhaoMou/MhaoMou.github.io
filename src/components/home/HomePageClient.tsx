@@ -1,6 +1,8 @@
 'use client';
 
 import Profile from '@/components/home/Profile';
+import PlayCorner from '@/components/home/PlayCorner';
+import EnjoyingShelf from '@/components/home/EnjoyingShelf';
 import About from '@/components/home/About';
 import SelectedPublications from '@/components/home/SelectedPublications';
 import News, { NewsItem } from '@/components/home/News';
@@ -157,6 +159,8 @@ export default function HomePageClient({ dataByLocale, defaultLocale }: HomePage
               )}
             </section>
           ))}
+          <EnjoyingShelf />
+          <PlayCorner />
         </div>
       </div>
     </div>
