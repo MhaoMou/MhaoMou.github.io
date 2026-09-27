@@ -34,10 +34,11 @@ id = "scholar_widget"
 type = "scholar_card"
 title = "Google Scholar"
 description = "Citation profile and publication impact."
-total_citations = 3
+total_citations = 4
 h_index = 1
 i10_index = 0
-last_checked = "September 16, 2026"
+last_checked = "September 27, 2026"
 trend = [
-  { year = "2025", citations = 3 }
+  { year = "2025", citations = 3 },
+  { year = "2026", citations = 1 },
 ]
