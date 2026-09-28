@@ -6,6 +6,8 @@ import { ExternalLink } from 'lucide-react';
 const games = [
   { title: 'Red Dead Redemption', cover: '/rdr1-cover.jpg', url: 'https://www.rockstargames.com/reddeadredemption/' },
   { title: 'Red Dead Redemption 2', cover: '/rdr2-cover.jpg', url: 'https://www.rockstargames.com/reddeadredemption2/' },
+  { title: 'Ghost of Tsushima', cover: '/ghost-of-tsushima-cover.jpg', url: 'https://www.playstation.com/en-us/games/ghost-of-tsushima/' },
+  { title: 'Kingdom Come: Deliverance II', cover: '/kingdom-come-deliverance-ii-cover.jpg', url: 'https://www.deepsilver.com/games/kingdom-come-deliverance-ii' },
 ];
 
 export default function EnjoyingShelf() {
@@ -50,7 +52,7 @@ export default function EnjoyingShelf() {
         objects.push(mesh);
         return mesh;
       }
-      const shelf = box(5.2, 0.17, 1.15, 0xa37650, 0, 0, 0);
+      const shelf = box(6.3, 0.17, 1.15, 0xa37650, 0, 0, 0);
       scene.add(shelf);
       const grain = document.createElement('canvas');
       grain.width = 512; grain.height = 64;
@@ -67,7 +69,7 @@ export default function EnjoyingShelf() {
         wood = new THREE.CanvasTexture(grain); wood.colorSpace = THREE.SRGBColorSpace;
         (shelf.material as import('three').MeshStandardMaterial).map = wood;
       }
-      [-1.8, 1.8].forEach(x => {
+      [-2.35, 2.35].forEach(x => {
         scene.add(box(0.09, 0.45, 0.55, 0x424b49, x, -0.3, -0.2));
       });
       const covers: import('three').Texture[] = [];
@@ -75,10 +77,10 @@ export default function EnjoyingShelf() {
       const loader = new THREE.TextureLoader();
       const cases = games.map((item, index) => {
       const game = new THREE.Group();
-      game.position.set(index === 0 ? -0.95 : 0.95, 1.19, 0.12);
+      game.position.set(-1.8 + index * 1.2, 1.19, 0.12);
       game.rotation.y = -0.16;
-      game.add(box(1.48, 2.2, 0.2, 0x22262a, 0, 0, 0));
-      const cover = new THREE.Mesh(new THREE.PlaneGeometry(1.4, 2.1), new THREE.MeshStandardMaterial({ color: 0xb71920, roughness: 0.6 }));
+      game.add(box(1.05, 2.2, 0.2, 0x22262a, 0, 0, 0));
+      const cover = new THREE.Mesh(new THREE.PlaneGeometry(0.97, 2.1), new THREE.MeshStandardMaterial({ color: 0xb71920, roughness: 0.6 }));
       cover.position.z = 0.105;
       game.add(cover); objects.push(cover);
       scene.add(game);
@@ -110,7 +112,7 @@ export default function EnjoyingShelf() {
         const height = element.clientHeight;
         renderer.setSize(width, height, false);
         camera.aspect = width / height;
-        camera.position.z = camera.aspect < 1.3 ? 9.6 : 7.5;
+        camera.position.z = camera.aspect < 1.3 ? 12.2 : 8.6;
         camera.updateProjectionMatrix();
       };
       const observer = new ResizeObserver(resize); observer.observe(element); resize();
@@ -132,11 +134,11 @@ export default function EnjoyingShelf() {
   return (
     <section id="enjoying" className="border-t border-neutral-200 pt-8">
       <h2 className="text-2xl font-serif font-bold text-primary">Currently enjoying</h2>
-      <div ref={host} role="img" aria-label="A wooden 3D shelf holding Red Dead Redemption and Red Dead Redemption 2 game cases" className="relative h-[300px] sm:h-[360px] w-full">
+      <div ref={host} role="img" aria-label="A wooden 3D shelf holding four game cases: Red Dead Redemption, Red Dead Redemption 2, Ghost of Tsushima, and Kingdom Come: Deliverance II" className="relative h-[300px] sm:h-[360px] w-full">
         {!rendered && <div className="absolute inset-0 flex gap-6 items-center justify-center pointer-events-none">
           {games.map(item => (
           // eslint-disable-next-line @next/next/no-img-element
-          <img key={item.title} src={item.cover} alt={`${item.title} cover`} width={140} height={210} className="h-[180px] w-[120px] sm:h-[210px] sm:w-[140px] object-cover shadow-xl" />
+          <img key={item.title} src={item.cover} alt={`${item.title} cover`} width={140} height={210} className="h-[150px] w-[90px] sm:h-[210px] sm:w-[135px] object-cover shadow-xl" />
           ))}
         </div>}
       </div>
