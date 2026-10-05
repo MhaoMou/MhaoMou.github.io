@@ -37,7 +37,7 @@ description = "Citation profile and publication impact."
 total_citations = 4
 h_index = 1
 i10_index = 0
-last_checked = "September 30, 2026"
+last_checked = "October 5, 2026"
 trend = [
   { year = "2025", citations = 3 },
   { year = "2026", citations = 1 },
