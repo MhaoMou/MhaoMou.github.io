@@ -4,6 +4,7 @@ import PublicationsList from '@/components/publications/PublicationsList';
 import TextPage from '@/components/pages/TextPage';
 import CardPage from '@/components/pages/CardPage';
 import BlogPage from '@/components/pages/BlogPage';
+import CvPage from '@/components/pages/CvPage';
 import { Publication } from '@/types/publication';
 import {
   PublicationPageConfig,
@@ -39,7 +40,7 @@ export default function DynamicPageClient({ dataByLocale, defaultLocale }: Dynam
         <PublicationsList config={pageData.config} publications={pageData.publications} />
       )}
       {pageData.type === 'text' && (
-        <TextPage config={pageData.config} content={pageData.content} />
+        pageData.config.source === 'cv.md' ? <CvPage /> : <TextPage config={pageData.config} content={pageData.content} />
       )}
       {pageData.type === 'card' && (
         <CardPage config={pageData.config} />
