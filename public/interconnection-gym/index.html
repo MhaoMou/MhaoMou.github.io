@@ -4,251 +4,209 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>interconnection-gym</title>
-<meta name="description" content="A simulator, reinforcement-learning environments, and benchmark for the batch interconnection of large loads such as data centers: allocation rules, equilibrium oracles, and network-derived scenarios.">
+<meta name="description" content="interconnection-gym: a simulator, reinforcement-learning environments, and a benchmark for the batch interconnection of large loads such as data centers, with equilibria known in closed form.">
 <meta property="og:title" content="interconnection-gym">
 <meta property="og:description" content="Batch interconnection of large loads as a multi-agent game: allocation rules, equilibrium oracles, RL environments, and benchmarks.">
 <link rel="icon" href="/favicon.png">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"
+        onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'\\(',right:'\\)',display:false}]});"></script>
 <style>
-:root {
-  --bg: #fefffe; --fg: #0f172a; --muted: #475569; --soft: #64748b; --line: #e2e8f0; --panel: #f8fafc;
-  --accent: #b8914d; --accent-bg: #f7efe2; --net: #1F4E79; --net-light: #BDD7EE; --bind: #C0392B; --code: #f1f5f9;
-  --h0: #e8f3ec; --h1: #f3f0dc; --h2: #f6e2c9; --h3: #f4d6d2;
-}
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #0f172a; --fg: #e2e8f0; --muted: #a3b1c6; --soft: #8b9ab0; --line: #1e293b; --panel: #131c31;
-    --accent: #e4b976; --accent-bg: #2a2416; --net: #8fb8e0; --net-light: #22405f; --bind: #e57366; --code: #111a2e;
-    --h0: #15302a; --h1: #2b2a17; --h2: #3a2a17; --h3: #3d1f1f;
-  }
-}
+@font-face { font-family: "Latin Modern Roman"; src: url("fonts/lmroman10-regular.woff2") format("woff2"); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: "Latin Modern Roman"; src: url("fonts/lmroman10-italic.woff2") format("woff2"); font-weight: 400; font-style: italic; font-display: swap; }
+@font-face { font-family: "Latin Modern Roman"; src: url("fonts/lmroman10-bold.woff2") format("woff2"); font-weight: 700; font-style: normal; font-display: swap; }
+@font-face { font-family: "Latin Modern Roman"; src: url("fonts/lmroman10-bolditalic.woff2") format("woff2"); font-weight: 700; font-style: italic; font-display: swap; }
+@font-face { font-family: "Latin Modern Mono"; src: url("fonts/lmmono10-regular.woff2") format("woff2"); font-weight: 400; font-style: normal; font-display: swap; }
+
+:root { --fg: #1a1a1a; --muted: #4a4a4a; --soft: #6b6b6b; --line: #dcdcdc; --code: #f6f6f4; --dark: #1F4E79; --red: #C0392B; }
 * { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; }
-body { margin: 0; background: var(--bg); color: var(--fg);
-  font: 16px/1.65 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
-a { color: var(--net); text-underline-offset: 3px; }
-a:hover { color: var(--accent); }
-.wrap { max-width: 880px; margin: 0 auto; padding: 0 20px; }
-header.top { border-bottom: 1px solid var(--line); }
-header.top .wrap { display: flex; justify-content: space-between; align-items: center; height: 56px; gap: 12px; }
-header.top a { color: var(--muted); text-decoration: none; font-size: 15px; }
-header.top a:hover { color: var(--fg); }
-header.top nav { display: flex; gap: 18px; flex-wrap: wrap; }
-.hero { padding: 56px 0 28px; }
-.eyebrow { color: var(--accent); font-weight: 600; letter-spacing: .04em; text-transform: uppercase; font-size: 13px; margin: 0 0 10px; }
-h1 { font-size: clamp(30px, 6vw, 44px); line-height: 1.1; margin: 0 0 14px; letter-spacing: -0.02em; }
-.lede { font-size: 19px; color: var(--muted); margin: 0 0 24px; max-width: 46em; }
-.buttons { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 18px; }
-.btn { display: inline-flex; align-items: center; gap: 8px; padding: 9px 16px; border-radius: 999px; border: 1px solid var(--line);
-  color: var(--fg); text-decoration: none; font-weight: 550; font-size: 15px; background: var(--panel); }
-.btn.primary { background: var(--fg); color: var(--bg); border-color: var(--fg); }
-.btn:hover { border-color: var(--accent); color: var(--fg); }
-.btn.primary:hover { color: var(--bg); background: var(--accent); border-color: var(--accent); }
-.note { color: var(--soft); font-size: 14px; }
-section { padding: 34px 0; border-top: 1px solid var(--line); }
-h2 { font-size: 25px; margin: 0 0 14px; letter-spacing: -0.01em; }
-h3 { font-size: 18px; margin: 26px 0 8px; }
-p { margin: 0 0 14px; }
-.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-.card { border: 1px solid var(--line); border-radius: 12px; padding: 18px; background: var(--panel); }
-.card h3 { margin-top: 0; }
-.card p:last-child { margin-bottom: 0; }
-figure { margin: 18px 0 8px; }
-figure svg { width: 100%; height: auto; display: block; max-width: 560px; margin: 0 auto; }
-figcaption { color: var(--muted); font-size: 14.5px; margin-top: 8px; }
-svg text { fill: var(--muted); font-size: 12px; font-family: inherit; }
-svg .lab { fill: var(--fg); font-size: 13px; font-weight: 550; }
-svg .soft { fill: var(--soft); font-weight: 400; font-style: italic; }
-svg .tiny { font-size: 11.5px; }
-svg .ax { stroke: var(--soft); stroke-width: 1; }
-svg .region { fill: var(--net-light); stroke: var(--net); stroke-width: 2; stroke-linejoin: round; }
-svg .ray { stroke: var(--accent); stroke-width: 2; stroke-dasharray: 5 4; }
-svg .eq { fill: var(--bind); stroke: var(--bg); stroke-width: 2; }
-svg .opt { fill: var(--net); stroke: var(--bg); stroke-width: 2; }
-svg .bar { fill: var(--net); }
-svg .req { fill: none; stroke: var(--bind); stroke-width: 1.5; stroke-dasharray: 4 3; }
-svg .box { fill: var(--panel); stroke: var(--line); stroke-width: 1.5; }
-svg .box.hl { stroke: var(--accent); }
-svg .arrow { stroke: var(--soft); stroke-width: 1.6; fill: none; marker-end: url(#ah); }
-svg .loop { stroke: var(--accent); stroke-width: 1.6; fill: none; stroke-dasharray: 5 4; marker-end: url(#ah2); }
-.table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 10px 0 6px; }
-table { border-collapse: collapse; width: 100%; font-size: 15px; font-variant-numeric: tabular-nums; }
-th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
-th { color: var(--muted); font-weight: 600; font-size: 14px; }
-td.h0, td.h1, td.h2, td.h3 { text-align: right; white-space: nowrap; }
-td.h0 { background: var(--h0); } td.h1 { background: var(--h1); } td.h2 { background: var(--h2); } td.h3 { background: var(--h3); }
-code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.9em; }
-pre { background: var(--code); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; overflow-x: auto; font-size: 13.5px; line-height: 1.55; margin: 10px 0 16px; }
-ul { padding-left: 22px; margin: 0 0 14px; }
-li { margin: 4px 0; }
-footer { border-top: 1px solid var(--line); padding: 28px 0 48px; color: var(--soft); font-size: 14px; }
-@media (max-width: 680px) {
-  .grid2 { grid-template-columns: 1fr; }
-  .hero { padding-top: 36px; }
-  .lede { font-size: 17px; }
-  header.top nav a.hide-sm { display: none; }
+body { margin: 0; background: #ffffff; color: var(--fg);
+  font-family: "Latin Modern Roman", "CMU Serif", "Computer Modern Serif", Georgia, serif;
+  font-size: 20px; line-height: 1.55; }
+a { color: var(--dark); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.container { max-width: 900px; margin: 0 auto; padding: 0 20px; }
+.wide { max-width: 1180px; }
+
+/* title block */
+.title-block { text-align: center; padding: 64px 20px 18px; }
+h1.title { font-size: 46px; font-weight: 700; line-height: 1.15; margin: 0 0 6px; letter-spacing: -0.005em; }
+.subtitle { font-size: 26px; margin: 0 0 22px; color: var(--muted); }
+.authors { font-size: 21px; margin: 0; }
+.affil { font-size: 18px; color: var(--soft); margin: 2px 0 22px; }
+.title-block p { text-align: center; }
+.links { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; }
+.links a, .links span { display: inline-flex; align-items: center; gap: 8px; padding: 7px 18px; border-radius: 999px;
+  background: #363636; color: #fff; font-size: 18px; line-height: 1.2; text-decoration: none; }
+.links a:hover { background: #111; }
+.links span.soon { background: #b5b5b5; cursor: default; }
+.links i { font-size: 17px; }
+
+/* teaser */
+.teaser { margin: 34px auto 6px; }
+.teaser img { width: 100%; display: block; }
+.caption { font-size: 17.5px; color: var(--muted); line-height: 1.5; margin: 8px 0 0; text-align: justify; hyphens: auto; }
+
+/* sections */
+section { padding: 26px 0 8px; }
+h2 { font-size: 30px; font-weight: 700; margin: 0 0 14px; text-align: center; }
+h3 { font-size: 22px; font-weight: 700; margin: 26px 0 8px; }
+p { margin: 0 0 14px; text-align: justify; hyphens: auto; }
+figure { margin: 22px 0 18px; }
+figure img { width: 100%; display: block; margin: 0 auto; }
+figure.narrow img { max-width: 720px; }
+.katex { font-size: 1.05em; }
+
+table { border-collapse: collapse; width: 100%; font-size: 18px; margin: 8px 0 16px; }
+th, td { text-align: left; padding: 7px 10px; vertical-align: top; }
+thead th { border-top: 1.5px solid var(--fg); border-bottom: 1px solid var(--fg); font-weight: 700; }
+tbody tr:last-child td { border-bottom: 1.5px solid var(--fg); }
+.table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+code, pre { font-family: "Latin Modern Mono", "CMU Typewriter Text", Menlo, Consolas, monospace; }
+code { font-size: 0.95em; }
+pre { background: var(--code); border-radius: 6px; padding: 14px 16px; overflow-x: auto; font-size: 16.5px; line-height: 1.45; margin: 10px 0 16px; }
+ul { margin: 0 0 14px; padding-left: 26px; }
+li { margin: 5px 0; }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 26px; }
+.two h3 { margin-top: 4px; }
+footer { border-top: 1px solid var(--line); margin-top: 34px; padding: 22px 20px 44px; font-size: 16px; color: var(--soft); text-align: center; }
+@media (max-width: 720px) {
+  body { font-size: 18px; }
+  h1.title { font-size: 34px; }
+  .subtitle { font-size: 21px; }
+  h2 { font-size: 25px; }
+  .two { grid-template-columns: 1fr; gap: 6px; }
+  p, .caption { text-align: left; }
+  .links a, .links span { font-size: 16px; padding: 6px 14px; }
+  pre { font-size: 14.5px; }
 }
 </style>
 </head>
 <body>
-<header class="top"><div class="wrap">
-  <a href="/">&larr; Minghao Mou</a>
-  <nav><a href="#how">How it works</a><a href="#operators" class="hide-sm">Operators</a><a href="#researchers" class="hide-sm">Researchers</a><a href="https://github.com/MhaoMou/interconnection-gym">GitHub</a></nav>
-</div></header>
 
-<main class="wrap">
-<div class="hero">
-  <p class="eyebrow">Open-source Python package · MIT</p>
-  <h1>interconnection-gym</h1>
-  <p class="lede">A simulator, reinforcement-learning environments, and a benchmark for the batch interconnection of large loads such as data centers. Applicants request grid capacity, the operator splits what the network can host with an allocation rule, and everyone pays for what they asked for. The equilibria are known in closed form, so rules can be compared and learning can be scored against ground truth.</p>
-  <div class="buttons">
-    <a class="btn primary" href="https://github.com/MhaoMou/interconnection-gym">Code on GitHub</a>
-    <a class="btn" href="https://github.com/MhaoMou/interconnection-gym/tree/main/docs">Documentation</a>
-    <a class="btn" href="https://github.com/MhaoMou/interconnection-gym/blob/main/benchmarks/RESULTS.md">Benchmark results</a>
-  </div>
-  <p class="note">Accompanying paper: forthcoming. Not yet on PyPI; install from GitHub (below).</p>
+<header class="container title-block">
+  <h1 class="title">interconnection-gym</h1>
+  <p class="subtitle">Batch Interconnection of Large Loads as a Multi-Agent Game</p>
+  <p class="authors"><a href="/">Minghao Mou</a></p>
+  <p class="affil">Purdue University</p>
+  <nav class="links" aria-label="Project links">
+    <a href="https://github.com/MhaoMou/interconnection-gym"><i class="fa-brands fa-github" aria-hidden="true"></i>Code</a>
+    <a href="docs/"><i class="fa-solid fa-book" aria-hidden="true"></i>Docs</a>
+    <a href="docs/api/"><i class="fa-solid fa-code" aria-hidden="true"></i>API</a>
+    <a href="https://github.com/MhaoMou/interconnection-gym/blob/main/benchmarks/RESULTS.md"><i class="fa-solid fa-chart-column" aria-hidden="true"></i>Benchmarks</a>
+    <span class="soon" title="The paper is forthcoming"><i class="fa-solid fa-file-pdf" aria-hidden="true"></i>Paper (soon)</span>
+  </nav>
+</header>
+
+<div class="container wide teaser">
+  <img src="figures/teaser.svg" alt="Three panels: a map of the synthetic Texas grid with six candidate buses and the equilibrium placement of three applicants; the batch region of two buses with the water-filling equilibrium and the planner's optimum; exploitability of independent policy-gradient learners over training on four tasks.">
+  <p class="caption"><b>(a)</b> Three applicants choose among six buses of the 2,000-bus synthetic Texas grid. At the equilibrium of the location game, two share the bus with the largest hosting capacity and the third takes a bus of its own. <b>(b)</b> Under the uniform rule, served loads rise together until a shared limit binds. With a commitment per requested megawatt, this max-min fair point is the unique equilibrium (IEEE 14-bus, buses 9 and 13). A planner would serve more in total: the price of anarchy is 1.44. <b>(c)</b> Independent learners that see only their own rewards are scored against the theory. Their exploitability falls toward zero where an equilibrium exists, and stays positive where none does.</p>
 </div>
 
-<section id="why">
-  <h2>Why</h2>
-  <p>Requests from data centers and other large loads now arrive faster than grid operators can study them one at a time, so operators are moving to <em>batch</em> studies: many requests are studied together, and the capacity the network can host is split among them. How it is split shapes what applicants ask for. An applicant that expects to be cut back may inflate its request; one that pays for every requested megawatt has a reason not to.</p>
-  <div class="grid2">
-    <div class="card"><h3>For operators and analysts</h3><p>Compare allocation rules and fees on your own network before adopting them: who gets served, how much capacity goes unused, and how much applicants inflate their requests at equilibrium.</p></div>
-    <div class="card"><h3>For researchers</h3><p>Multi-agent games with continuous and discrete actions whose equilibria are proven, on real network-derived scenarios, with PettingZoo and Gymnasium interfaces and benchmark tasks scored by exploitability.</p></div>
+<main class="container">
+
+<section>
+  <h2>Overview</h2>
+  <p>Requests from data centers and other large loads now arrive faster than grid operators can study them one at a time, so operators are moving to <em>batch</em> studies. Many requests are studied together, and the capacity the network can host is split among them. How it is split shapes what applicants ask for: an applicant that expects to be cut back may inflate its request, while one that pays for every requested megawatt has a reason not to.</p>
+  <p><b>interconnection-gym</b> turns this into a multi-agent game on real network data. The equilibria of the allocation rules are known in closed form, so operators can compare rules before adopting them, and learning agents can be scored against ground truth.</p>
+  <div class="two">
+    <div><h3>For operators</h3><p>Compare allocation rules and fees on your own network: who gets served, how much capacity goes unused, and how much applicants inflate their requests at equilibrium.</p></div>
+    <div><h3>For researchers</h3><p>PettingZoo and Gymnasium environments with continuous and discrete actions, proven equilibria, network-derived scenarios, and benchmark tasks scored by exploitability.</p></div>
   </div>
 </section>
 
-<section id="how">
-  <h2>How it works</h2>
-  <figure>
-    <svg viewBox="0 0 760 210" role="img" aria-labelledby="fp-t fp-d" style="max-width:760px">
-      <title id="fp-t">The batch game</title>
-      <desc id="fp-d">Applicants choose requests; the network defines the batch region of loads it can host; the operator's rule allocates served loads inside the region; each applicant earns the value of its served load minus the commitment it paid. Learning agents or best responses update the requests.</desc>
-      <defs>
-        <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--soft)"/></marker>
-        <marker id="ah2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--accent)"/></marker>
-      </defs>
-      <rect x="10" y="40" width="160" height="92" rx="10" class="box"/>
-      <text x="90" y="70" text-anchor="middle" class="lab">Applicants</text>
-      <text x="90" y="92" text-anchor="middle">request r&#7522; MW</text>
-      <text x="90" y="112" text-anchor="middle">at a bus they choose</text>
-      <rect x="205" y="40" width="160" height="92" rx="10" class="box"/>
-      <text x="285" y="70" text-anchor="middle" class="lab">Network</text>
-      <text x="285" y="92" text-anchor="middle">batch region</text>
-      <text x="285" y="112" text-anchor="middle">{s &#8805; 0 : As &#8804; b}</text>
-      <rect x="400" y="40" width="160" height="92" rx="10" class="box hl"/>
-      <text x="480" y="70" text-anchor="middle" class="lab">Operator's rule</text>
-      <text x="480" y="92" text-anchor="middle">uniform, proportional,</text>
-      <text x="480" y="112" text-anchor="middle">utilitarian; minimum &#946;</text>
-      <rect x="595" y="40" width="155" height="92" rx="10" class="box"/>
-      <text x="672" y="70" text-anchor="middle" class="lab">Payoffs</text>
-      <text x="672" y="92" text-anchor="middle">V s&#7522; &#8722; &#954; r&#7522;</text>
-      <text x="672" y="112" text-anchor="middle">served s &#8804; r</text>
-      <path d="M170 86 H200" class="arrow"/><path d="M365 86 H395" class="arrow"/><path d="M560 86 H590" class="arrow"/>
-      <path d="M672 132 V168 H90 V137" class="loop"/>
-      <text x="380" y="190" text-anchor="middle" class="soft lab">best responses or learning update the requests</text>
-    </svg>
-    <figcaption>The batch game. The network enters only through its batch region: the served loads that every studied hour can host after redispatch, exported exactly from a DC power-flow scenario. Location choice, on-site generation and storage, and non-firm service extend the strategies.</figcaption>
-  </figure>
-  <figure>
-    <svg viewBox="0 0 440 300" role="img" aria-labelledby="fr-t fr-d">
-<title id="fr-t">Batch region of two applicants and the water-filling equilibrium</title>
-<desc id="fr-d">The region of loads the IEEE 14-bus network can host at buses 9 and 13. Water-filling raises both loads together until a shared limit binds at 41.9 MW each, the max-min fair point; the planner's optimum is 100 MW and 20.9 MW.</desc>
-<polygon points="58.0,262.0 382.3,262.0 373.0,187.7 283.6,143.9 227.7,124.6 82.5,81.7 58.0,81.7" class="region"/>
-<line x1="58.0" y1="262.0" x2="221.79999999999998" y2="77.4" class="ray"/>
-<line x1="58" y1="262" x2="404.5" y2="262" class="ax"/><line x1="58" y1="262" x2="58" y2="41.900000000000006" class="ax"/>
-<line x1="58.0" y1="262" x2="58.0" y2="267" class="ax"/><text x="58.0" y="281" text-anchor="middle">0</text><line x1="136.8" y1="262" x2="136.8" y2="267" class="ax"/><text x="136.8" y="281" text-anchor="middle">25</text><line x1="215.5" y1="262" x2="215.5" y2="267" class="ax"/><text x="215.5" y="281" text-anchor="middle">50</text><line x1="294.2" y1="262" x2="294.2" y2="267" class="ax"/><text x="294.2" y="281" text-anchor="middle">75</text><line x1="373.0" y1="262" x2="373.0" y2="267" class="ax"/><text x="373.0" y="281" text-anchor="middle">100</text><line x1="53" y1="262.0" x2="58" y2="262.0" class="ax"/><text x="49" y="266.0" text-anchor="end">0</text><line x1="53" y1="191.0" x2="58" y2="191.0" class="ax"/><text x="49" y="195.0" text-anchor="end">20</text><line x1="53" y1="120.0" x2="58" y2="120.0" class="ax"/><text x="49" y="124.0" text-anchor="end">40</text><line x1="53" y1="49.0" x2="58" y2="49.0" class="ax"/><text x="49" y="53.0" text-anchor="end">60</text>
-<circle cx="189.8" cy="113.4" r="6" class="eq"/>
-<text x="201.8" y="135.4" class="lab">equilibrium w = (41.9, 41.9)</text>
-<circle cx="373.0" cy="187.7" r="5.5" class="opt"/>
-<text x="363.0" y="211.7" text-anchor="end" class="lab">planner (100, 20.9)</text>
-<text x="234.4" y="59.7" class="lab soft">common level rises</text>
-<text x="231.2" y="300" text-anchor="middle">served at bus 9 (MW)</text>
-<text x="18" y="155.5" text-anchor="middle" transform="rotate(-90 18 155.5)">served at bus 13 (MW)</text>
-</svg>
-    <figcaption>Under the default uniform rule, served loads rise together until a limit binds: water-filling. With a commitment fee per requested megawatt, the stopping point, the max-min fair point <i>w</i>, is the unique equilibrium, and every request is served in full. Here (IEEE 14-bus, buses 9 and 13) it gives 41.9 MW each, while a planner maximizing total load would serve 100 and 20.9 MW: a price of anarchy of 1.44, below the bound of 1.58.</figcaption>
-  </figure>
+<section>
+  <h2>The Batch Game</h2>
+  <p>Applicant \(i\) requests \(r_i\) MW at a bus. The network enters only through its <em>batch region</em>: the served loads that every studied hour can host after the existing generators are redispatched. The region is exported exactly from a DC power-flow scenario,</p>
+  $$\tilde{\mathcal H} = \{\, s \ge 0 : A s \le b \,\}, \qquad s = U(r) \in \tilde{\mathcal H}, \quad s \le r .$$
+  <p>The operator's rule \(U\) splits the region among the requests. The default <em>uniform rule</em> raises every served load together, and stops each one at its request or when a limit it loads binds (water-filling). A minimum allocation \(\beta\) drops applicants served less than \(\beta r_i\). Each applicant earns the value of what it is served, minus a commitment on what it requested,</p>
+  $$u_i(r) = V\, s_i - \kappa\, r_i .$$
+  <p>The package also models the proportional and utilitarian rules, flat fees and security deposits, location choice, on-site generation and storage, and firm and non-firm service.</p>
 </section>
 
-<section id="theory">
-  <h2>What the theory gives you</h2>
-  <p>Each result below is exposed as an oracle in the package and checked against the engine by the test suite.</p>
+<section>
+  <h2>What the Theory Guarantees</h2>
+  <p>Each result is exposed as an oracle in the package, and the test suite checks it against the engine.</p>
   <div class="table-wrap"><table>
-    <tr><th>Setting</th><th>Equilibrium</th><th>In the package</th></tr>
-    <tr><td>Uniform rule, per-MW commitment</td><td>the max-min fair point <i>w</i>, unique, served in full, for any minimum allocation</td><td><code>predicted_equilibrium</code></td></tr>
-    <tr><td>Best-response dynamics</td><td>reach <i>w</i> within 2<i>n</i> rounds (no minimum allocation)</td><td><code>best_response_dynamics</code></td></tr>
-    <tr><td>Flat fee</td><td>every profile in [<i>w</i>, <i>w</i>/&#946;], all serving <i>w</i></td><td><code>predicted_equilibrium</code></td></tr>
-    <tr><td>Proportional rule, one limit</td><td>requests inflated by &#961; = min(max((1&#8722;1/<i>n</i>)<i>V</i>/&#954;, 1), 1/&#946;)</td><td><code>proportional_inflation</code></td></tr>
-    <tr><td>Efficiency</td><td>price of anarchy at most (1+<i>nR</i>)&#178;/(4<i>nR</i>), <i>R</i> the spread of hosting capacities</td><td><code>poa_bound</code></td></tr>
-    <tr><td>Location choice</td><td>a strong pure equilibrium; every improving move raises the sorted shares</td><td><code>LocationGame</code></td></tr>
-    <tr><td>On-site generation</td><td>three regimes under the gross rule (no build, all at the cap, none); unique under crediting</td><td><code>GenerationGame</code></td></tr>
-    <tr><td>Firm and non-firm service</td><td>an equilibrium on any network under the two-tier rule, served in full</td><td><code>NonFirmGame</code></td></tr>
+    <thead><tr><th>Setting</th><th>Equilibrium</th><th>In the package</th></tr></thead>
+    <tbody>
+      <tr><td>Uniform rule, per-MW commitment</td><td>the max-min fair point \(w\), unique and served in full, for any \(\beta\)</td><td><code>predicted_equilibrium</code></td></tr>
+      <tr><td>Best-response dynamics</td><td>reach \(w\) within \(2n\) rounds (no minimum allocation)</td><td><code>best_response_dynamics</code></td></tr>
+      <tr><td>Flat fee</td><td>every profile in \([w, w/\beta]\), all serving \(w\)</td><td><code>predicted_equilibrium</code></td></tr>
+      <tr><td>Proportional rule, one limit</td><td>requests inflated by \(\rho = \min\{\max\{(1-1/n)V/\kappa, 1\}, 1/\beta\}\)</td><td><code>proportional_inflation</code></td></tr>
+      <tr><td>Efficiency</td><td>price of anarchy at most \((1+nR)^2/(4nR)\), with \(R\) the spread of hosting capacities</td><td><code>poa_bound</code></td></tr>
+      <tr><td>Location choice</td><td>a strong pure equilibrium; every improving move raises the sorted shares</td><td><code>LocationGame</code></td></tr>
+      <tr><td>On-site generation</td><td>three regimes under the gross rule (no build, all at the cap, none); unique under crediting</td><td><code>GenerationGame</code></td></tr>
+      <tr><td>Firm and non-firm service</td><td>an equilibrium on any network under the two-tier rule, served in full</td><td><code>NonFirmGame</code></td></tr>
+    </tbody>
   </table></div>
 </section>
 
-<section id="operators">
-  <h2>For operators: compare rules on your network</h2>
-  <p><code>icgym-compare</code> takes a DC power-flow scenario (bus, branch, generator, and hourly demand CSV files) and the buses in the batch, finds each rule's equilibrium, and reports served MW, efficiency against the planner's optimum, request inflation, capacity paid for but not served, the binding limits, and a self-contained HTML report.</p>
-  <pre><code>icgym-compare --data path/to/scenario --buses 9,13,14 \
+<section>
+  <h2>For Operators: Compare Rules</h2>
+  <p><code>icgym-compare</code> takes a DC power-flow scenario and the buses in a batch, and finds each rule's equilibrium. It reports served megawatts, efficiency against the planner's optimum, request inflation, capacity paid for but not served, and the binding limits. The output is a table, JSON, or an HTML report.</p>
+<pre><code>icgym-compare --data path/to/scenario --buses 9,13,14 \
     --rules uniform,proportional,utilitarian --kappa 0.4 --beta 0.5 --html report.html</code></pre>
   <figure>
-    <svg viewBox="0 0 470 236" role="img" aria-labelledby="fc-t fc-d">
-<title id="fc-t">Equilibria of three allocation rules on one batch</title>
-<desc id="fc-d">Served MW (filled) and requested MW above it (outlined) for buses 9, 13 and 14 under the uniform, proportional, and utilitarian rules.</desc>
-<line x1="34" y1="180" x2="460" y2="180" class="ax"/>
-<text x="95" y="18" text-anchor="middle" class="lab">Uniform</text><rect x="40" y="109.8" width="30" height="70.2" class="bar"><title>Uniform, bus 9: served 46.8 MW, requested 46.8 MW</title></rect><text x="55.0" y="194" text-anchor="middle" class="tiny">9</text><rect x="80" y="141.9" width="30" height="38.1" class="bar"><title>Uniform, bus 13: served 25.4 MW, requested 25.4 MW</title></rect><text x="95.0" y="194" text-anchor="middle" class="tiny">13</text><rect x="120" y="141.9" width="30" height="38.1" class="bar"><title>Uniform, bus 14: served 25.4 MW, requested 25.4 MW</title></rect><text x="135.0" y="194" text-anchor="middle" class="tiny">14</text><text x="95" y="212" text-anchor="middle" class="tiny">efficiency 0.807</text><text x="95" y="227" text-anchor="middle" class="tiny">inflation 1.00</text><text x="251" y="18" text-anchor="middle" class="lab">Proportional</text><rect x="196" y="97.7" width="30" height="82.3" class="bar"><title>Proportional, bus 9: served 54.9 MW, requested 92.5 MW</title></rect><rect x="196" y="41.2" width="30" height="56.4" class="req"/><text x="211.0" y="194" text-anchor="middle" class="tiny">9</text><rect x="236" y="149.6" width="30" height="30.4" class="bar"><title>Proportional, bus 13: served 20.3 MW, requested 34.2 MW</title></rect><rect x="236" y="128.7" width="30" height="20.9" class="req"/><text x="251.0" y="194" text-anchor="middle" class="tiny">13</text><rect x="276" y="135.4" width="30" height="44.6" class="bar"><title>Proportional, bus 14: served 29.7 MW, requested 50.1 MW</title></rect><rect x="276" y="104.8" width="30" height="30.6" class="req"/><text x="291.0" y="194" text-anchor="middle" class="tiny">14</text><text x="251" y="212" text-anchor="middle" class="tiny">efficiency 0.867</text><text x="251" y="227" text-anchor="middle" class="tiny">inflation 1.69</text><text x="407" y="18" text-anchor="middle" class="lab">Utilitarian</text><rect x="352" y="42.7" width="30" height="137.3" class="bar"><title>Utilitarian, bus 9: served 91.5 MW, requested 91.5 MW</title></rect><text x="367.0" y="194" text-anchor="middle" class="tiny">9</text><rect x="392" y="158.4" width="30" height="21.6" class="bar"><title>Utilitarian, bus 13: served 14.4 MW, requested 14.4 MW</title></rect><text x="407.0" y="194" text-anchor="middle" class="tiny">13</text><rect x="432" y="157.5" width="30" height="22.5" class="bar"><title>Utilitarian, bus 14: served 15.0 MW, requested 15.0 MW</title></rect><text x="447.0" y="194" text-anchor="middle" class="tiny">14</text><text x="407" y="212" text-anchor="middle" class="tiny">efficiency 1.000</text><text x="407" y="227" text-anchor="middle" class="tiny">inflation 1.00</text>
-</svg>
-    <figcaption>Three rules on one batch (IEEE 14-bus, buses 9, 13 and 14). Filled: served MW; dashed outline: requested but not served. The uniform rule serves less in total but every request is honest; the proportional rule inflates every request by 1.69, so applicants pay for capacity they do not get; the utilitarian rule reaches the planner's total here but concentrates service on the site that loads the limits least.</figcaption>
+    <img src="figures/rules.svg" alt="Bar chart of served and requested megawatts at buses 9, 13 and 14 under the uniform, proportional, and utilitarian rules.">
+    <p class="caption">Three rules on one batch of the IEEE 14-bus system. The uniform rule serves less in total, but every request is honest. The proportional rule serves more, yet every applicant inflates its request by 1.69 and pays for capacity it does not get. The utilitarian rule reaches the planner's total here, by concentrating service on the site that loads the limits least.</p>
   </figure>
-  <p>For batches of any size on large networks, the exact network region can be kept implicit and queried by linear programs (<code>--implicit</code>), at seconds per allocation on the 2,000-bus synthetic Texas grid.</p>
+  <p>For batches of any size on large networks, <code>--implicit</code> keeps the exact network region implicit and queries it with linear programs, at seconds per allocation on the 2,000-bus grid.</p>
 </section>
 
-<section id="researchers">
-  <h2>For researchers: environments and benchmarks</h2>
+<section>
+  <h2>For Researchers: Environments and Benchmarks</h2>
   <div class="table-wrap"><table>
-    <tr><th>Environment</th><th>Interface</th><th>Actions</th></tr>
-    <tr><td><code>BatchRequestParallelEnv</code></td><td>PettingZoo <code>ParallelEnv</code></td><td>request (continuous)</td></tr>
-    <tr><td><code>SingleApplicantEnv</code></td><td>Gymnasium <code>Env</code></td><td>one learner against fixed rival policies</td></tr>
-    <tr><td><code>LocationParallelEnv</code></td><td>PettingZoo <code>ParallelEnv</code></td><td>a bus from a menu (discrete)</td></tr>
-    <tr><td><code>DeviceParallelEnv</code></td><td>PettingZoo <code>ParallelEnv</code></td><td>request plus generator, battery, or non-firm share</td></tr>
-    <tr><td><code>VectorBatchRequestEnv</code></td><td>numpy, many copies per call</td><td>batched requests, about 50&times; faster</td></tr>
+    <thead><tr><th>Environment</th><th>Interface</th><th>Actions</th></tr></thead>
+    <tbody>
+      <tr><td><code>BatchRequestParallelEnv</code></td><td>PettingZoo</td><td>a request (continuous)</td></tr>
+      <tr><td><code>SingleApplicantEnv</code></td><td>Gymnasium</td><td>one learner against fixed rival policies</td></tr>
+      <tr><td><code>LocationParallelEnv</code></td><td>PettingZoo</td><td>a bus from a menu (discrete)</td></tr>
+      <tr><td><code>DeviceParallelEnv</code></td><td>PettingZoo</td><td>a request plus a generator, battery, or non-firm share</td></tr>
+      <tr><td><code>VectorBatchRequestEnv</code></td><td>NumPy, many copies per call</td><td>batched requests, about 50 times faster</td></tr>
+    </tbody>
   </table></div>
-  <pre><code>from icgym import BatchGame, PerMWCommitment, UniformRule, ieee14
-from icgym.envs import BatchRequestParallelEnv      # PettingZoo ParallelEnv
+<pre><code>from icgym import BatchGame, PerMWCommitment, UniformRule, ieee14
+from icgym.envs import BatchRequestParallelEnv       # PettingZoo ParallelEnv
 from icgym.benchmarks import run
 
 game = BatchGame(ieee14((9, 13, 14)), UniformRule(beta=0.5), PerMWCommitment(0.4))
-env = BatchRequestParallelEnv(game, rounds=20, observation=&quot;public&quot;)
-run(&quot;uniform-ieee14&quot;, &quot;independent_pg&quot;, seed=0)     # exploitability, distance to w, efficiency</code></pre>
-  <h3>Benchmark: exploitability of the final profile</h3>
-  <p>Eight tasks with known answers, three baselines, mean over three seeds; exploitability is the largest gain any agent has from deviating alone, relative to its value at its hosting capacity (0 at an equilibrium).</p>
-  <div class="table-wrap"><table>
-    <tr><th>Task</th><th>Answer</th><th style="text-align:right">Best responses</th><th style="text-align:right">Hedge</th><th style="text-align:right">Policy gradient</th></tr>
-    <tr><td><code>uniform-ieee14</code></td><td>unique</td><td class="h0">0.0000</td><td class="h2">0.0101</td><td class="h0">0.0002</td></tr><tr><td><code>uniform-random8</code></td><td>unique</td><td class="h0">0.0000</td><td class="h2">0.0125</td><td class="h0">0.0002</td></tr><tr><td><code>flatfee-ieee14</code></td><td>band</td><td class="h0">0.0000</td><td class="h0">0.0000</td><td class="h0">0.0000</td></tr><tr><td><code>proportional-limit</code></td><td>unique</td><td class="h3">0.3333</td><td class="h0">0.0008</td><td class="h0">0.0000</td></tr><tr><td><code>location-activsg2000</code></td><td>3 equilibria</td><td class="h0">0.0000</td><td class="h0">0.0000</td><td class="h0">0.0000</td></tr><tr><td><code>generation-credit</code></td><td>unique</td><td class="h0">0.0000</td><td class="h2">0.0145</td><td class="h1">0.0014</td></tr><tr><td><code>generation-gross-cycle</code></td><td>none exists</td><td class="h2">0.0237</td><td class="h2">0.0300</td><td class="h2">0.0197</td></tr><tr><td><code>nonfirm-two-tier</code></td><td>unique</td><td class="h0">0.0000</td><td class="h3">0.1421</td><td class="h1">0.0011</td></tr>
-  </table></div>
-  <p class="note">Independent policy gradient, which sees only its own rewards, reaches the equilibrium wherever one exists. Where none exists, every baseline stays exploitable, as the theory predicts. Under the proportional rule with a minimum allocation, best responses stall because the best payoff is a vanishing undercut of a rival and is never attained.</p>
+env = BatchRequestParallelEnv(game, rounds=20, observation="public")
+run("uniform-ieee14", "independent_pg", seed=0)      # exploitability, distance to w, efficiency</code></pre>
+  <figure class="narrow">
+    <img src="figures/benchmarks.svg" alt="Heat map of the exploitability of the final profile for eight benchmark tasks and three baselines.">
+    <p class="caption">Eight tasks with known answers and three baselines, mean over three seeds. Each cell is the exploitability of the final profile: the largest gain any agent has from deviating alone, relative to its value at its hosting capacity (0 at an equilibrium). Policy gradient, which sees only rewards, reaches the equilibrium wherever one exists. In the generation game with no pure equilibrium, every baseline stays exploitable. Under the proportional rule with a minimum allocation, best responses stall: the best payoff is a vanishing undercut of a rival, and it is never attained.</p>
+  </figure>
 </section>
 
-<section id="data">
+<section>
   <h2>Data</h2>
   <ul>
-    <li><b>ACTIVSg2000</b> (synthetic 2,000-bus Texas grid, five representative days): exact batch regions of 150 bus pairs, 35 batches of two or three buses, and 8 location multisets ship with the package, with reference results for batches of five buses and a location game over six buses. Adapted from a CC BY 3.0 work; please cite Birchfield et al., IEEE Trans. Power Systems, 2017.</li>
-    <li><b>IEEE 14-bus</b>: built on your machine on first use, from the public case file and the package's own limits and load profile; any set of buses is exported in seconds. The case file itself is not redistributed.</li>
+    <li><b>ACTIVSg2000</b>, the synthetic 2,000-bus Texas grid, over five representative days. The package ships exact batch regions of 150 bus pairs, 35 batches of two or three buses, and 8 location multisets, plus reference results for batches of five buses and for a location game over six buses. The data is adapted from a CC BY 3.0 work; please cite Birchfield et al., <i>IEEE Trans. Power Systems</i>, 2017.</li>
+    <li><b>IEEE 14-bus</b>, built on your machine on first use, from the public case file and the package's own limits and load profile. Any set of buses is exported in seconds. The case file itself is not redistributed.</li>
     <li><b>Your network</b>: <code>icgym-export</code> builds the exact batch region of any buses from a DC power-flow scenario.</li>
   </ul>
 </section>
 
-<section id="start">
-  <h2>Get started</h2>
-  <pre><code>pip install "interconnection-gym[envs] @ git+https://github.com/MhaoMou/interconnection-gym"</code></pre>
-  <pre><code>from icgym import BatchGame, PerMWCommitment, Region, UniformRule, predicted_equilibrium
+<section>
+  <h2>Get Started</h2>
+<pre><code>pip install "interconnection-gym[envs] @ git+https://github.com/MhaoMou/interconnection-gym"</code></pre>
+<pre><code>from icgym import BatchGame, PerMWCommitment, Region, UniformRule
 
 region = Region(A=[[1.0, 1.0, 0.0], [0.0, 1.0, 1.0]], b=[2.0, 3.0])   # two shared limits
 game = BatchGame(region, UniformRule(beta=0.5), PerMWCommitment(kappa=0.4), value=1.0)
 
-w = predicted_equilibrium(game)[&quot;requests&quot;]   # unique equilibrium: [1, 1, 2]
-game.exploitability([1.5, 1.0, 2.0])          # applicant 0 gains 0.2 by returning to w</code></pre>
-  <h3>Cite</h3>
-  <pre><code>@software{interconnection_gym,
+w = game.predicted_equilibrium()["requests"]   # the unique equilibrium: [1, 1, 2]
+game.exploitability([1.5, 1.0, 2.0])           # applicant 0 gains 0.2 by returning to w</code></pre>
+</section>
+
+<section>
+  <h2>BibTeX</h2>
+<pre><code>@software{interconnection_gym,
   title   = {interconnection-gym: Batch Interconnection of Large Loads as a Multi-Agent Game},
   author  = {Mou, Minghao},
   year    = {2026},
@@ -256,8 +214,11 @@ game.exploitability([1.5, 1.0, 2.0])          # applicant 0 gains 0.2 by returni
   url     = {https://github.com/MhaoMou/interconnection-gym}
 }</code></pre>
 </section>
+
 </main>
 
-<footer><div class="wrap">interconnection-gym is developed by <a href="/">Minghao Mou</a>. Code: MIT license. Bundled data: see <a href="https://github.com/MhaoMou/interconnection-gym/blob/main/docs/data.md">data and licenses</a>.</div></footer>
+<footer class="container">
+  Code under the MIT license; bundled data under the terms in the <a href="docs/data/">data notes</a>. Set in Latin Modern (GUST Font License). Layout after the Nerfies project page.
+</footer>
 </body>
 </html>

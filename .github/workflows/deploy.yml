@@ -34,6 +34,23 @@ jobs:
       - name: Build site
         run: npm run build
 
+      - name: Check out the interconnection-gym docs
+        uses: actions/checkout@v4
+        with:
+          repository: MhaoMou/interconnection-gym
+          path: interconnection-gym
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Build the interconnection-gym documentation into the site
+        run: |
+          pip install "mkdocs-material>=9.5,<10" "mkdocstrings[python]>=0.26"
+          cd interconnection-gym
+          mkdocs build --strict -d ../out/interconnection-gym/docs
+
       - name: Add nojekyll marker
         run: touch out/.nojekyll
 
