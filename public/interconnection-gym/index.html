@@ -38,6 +38,10 @@ h1.title { font-size: 46px; font-weight: 700; line-height: 1.15; margin: 0 0 6px
 .authors { font-size: 21px; margin: 0; }
 .affil { font-size: 18px; color: var(--soft); margin: 2px 0 22px; }
 .title-block p { text-align: center; }
+.hl { color: var(--dark); font-weight: 700; }
+.hl-red { color: var(--red); font-weight: 700; }
+.note-box { border-left: 4px solid var(--dark); background: #f3f7fb; padding: 12px 16px; margin: 14px 0 16px; border-radius: 0 6px 6px 0; }
+.note-box p { margin: 0; }
 .links { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; }
 .links a, .links span { display: inline-flex; align-items: center; gap: 8px; padding: 7px 18px; border-radius: 999px;
   background: #363636; color: #fff; font-size: 18px; line-height: 1.2; text-decoration: none; }
@@ -111,8 +115,8 @@ footer { border-top: 1px solid var(--line); margin-top: 34px; padding: 22px 20px
 
 <section>
   <h2>Overview</h2>
-  <p>Requests from data centers and other large loads now arrive faster than grid operators can study them one at a time, so operators are moving to <em>batch</em> studies. Many requests are studied together, and the capacity the network can host is split among them. How it is split shapes what applicants ask for: an applicant that expects to be cut back may inflate its request, while one that pays for every requested megawatt has a reason not to.</p>
-  <p><b>interconnection-gym</b> turns this into a multi-agent game on real network data. The equilibria of the allocation rules are known in closed form, so operators can compare rules before adopting them, and learning agents can be scored against ground truth.</p>
+  <p>Requests from data centers and other large loads now arrive faster than grid operators can study them one at a time, so operators are moving to <span class="hl">batch studies</span>. Many requests are studied together, and the capacity the network can host is split among them. How it is split shapes what applicants ask for: an applicant that expects to be cut back may <span class="hl-red">inflate its request</span>, while one that <span class="hl">pays for every requested megawatt</span> has a reason not to.</p>
+  <p><b>interconnection-gym</b> turns this into a multi-agent game on real network data. The equilibria of the allocation rules are <span class="hl">known in closed form</span>, so operators can compare rules before adopting them, and learning agents can be scored against ground truth.</p>
   <div class="two">
     <div><h3>For operators</h3><p>Compare allocation rules and fees on your own network: who gets served, how much capacity goes unused, and how much applicants inflate their requests at equilibrium.</p></div>
     <div><h3>For researchers</h3><p>PettingZoo and Gymnasium environments with continuous and discrete actions, proven equilibria, network-derived scenarios, and benchmark tasks scored by exploitability.</p></div>
@@ -121,9 +125,10 @@ footer { border-top: 1px solid var(--line); margin-top: 34px; padding: 22px 20px
 
 <section>
   <h2>The Batch Game</h2>
-  <p>Applicant \(i\) requests \(r_i\) MW at a bus. The network enters only through its <em>batch region</em>: the served loads that every studied hour can host after the existing generators are redispatched. The region is exported exactly from a DC power-flow scenario,</p>
+  <div class="note-box"><p><span class="hl">Locations are fixed in the default game.</span> Applicant \(i\) sits at a given bus and chooses <em>only</em> how many megawatts to request. Letting applicants also choose where to connect is a separate game, the <span class="hl">location game</span> (<code>LocationGame</code>); generators, batteries, and non-firm service add a second decision at the same fixed bus.</p></div>
+  <p>Applicant \(i\) requests \(r_i\) MW at its bus. The network enters only through its <em>batch region</em>: the served loads that every studied hour can host after the existing generators are redispatched. The region is exported exactly from a DC power-flow scenario,</p>
   $$\tilde{\mathcal H} = \{\, s \ge 0 : A s \le b \,\}, \qquad s = U(r) \in \tilde{\mathcal H}, \quad s \le r .$$
-  <p>The operator's rule \(U\) splits the region among the requests. The default <em>uniform rule</em> raises every served load together, and stops each one at its request or when a limit it loads binds (water-filling). A minimum allocation \(\beta\) drops applicants served less than \(\beta r_i\). Each applicant earns the value of what it is served, minus a commitment on what it requested,</p>
+  <p>The operator's rule \(U\) splits the region among the requests. The default <span class="hl">uniform rule</span> raises every served load together, and stops each one at its request or when a limit it loads binds (water-filling). A minimum allocation \(\beta\) drops applicants served less than \(\beta r_i\). Each applicant earns the value of what it is served, minus a commitment on what it requested,</p>
   $$u_i(r) = V\, s_i - \kappa\, r_i .$$
   <p>The package also models the proportional and utilitarian rules, flat fees and security deposits, location choice, on-site generation and storage, and firm and non-firm service.</p>
 </section>
@@ -134,12 +139,12 @@ footer { border-top: 1px solid var(--line); margin-top: 34px; padding: 22px 20px
   <div class="table-wrap"><table>
     <thead><tr><th>Setting</th><th>Equilibrium</th><th>In the package</th></tr></thead>
     <tbody>
-      <tr><td>Uniform rule, per-MW commitment</td><td>the max-min fair point \(w\), unique and served in full, for any \(\beta\)</td><td><code>predicted_equilibrium</code></td></tr>
+      <tr><td>Uniform rule, per-MW commitment (fixed buses)</td><td>the max-min fair point \(w\), <span class="hl">unique and served in full</span>, for any \(\beta\)</td><td><code>predicted_equilibrium</code></td></tr>
       <tr><td>Best-response dynamics</td><td>reach \(w\) within \(2n\) rounds (no minimum allocation)</td><td><code>best_response_dynamics</code></td></tr>
       <tr><td>Flat fee</td><td>every profile in \([w, w/\beta]\), all serving \(w\)</td><td><code>predicted_equilibrium</code></td></tr>
-      <tr><td>Proportional rule, one limit</td><td>requests inflated by \(\rho = \min\{\max\{(1-1/n)V/\kappa, 1\}, 1/\beta\}\)</td><td><code>proportional_inflation</code></td></tr>
+      <tr><td>Proportional rule, one limit</td><td>requests <span class="hl-red">inflated</span> by \(\rho = \min\{\max\{(1-1/n)V/\kappa, 1\}, 1/\beta\}\)</td><td><code>proportional_inflation</code></td></tr>
       <tr><td>Efficiency</td><td>price of anarchy at most \((1+nR)^2/(4nR)\), with \(R\) the spread of hosting capacities</td><td><code>poa_bound</code></td></tr>
-      <tr><td>Location choice</td><td>a strong pure equilibrium; every improving move raises the sorted shares</td><td><code>LocationGame</code></td></tr>
+      <tr><td>Location choice (buses chosen)</td><td>a strong pure equilibrium; every improving move raises the sorted shares</td><td><code>LocationGame</code></td></tr>
       <tr><td>On-site generation</td><td>three regimes under the gross rule (no build, all at the cap, none); unique under crediting</td><td><code>GenerationGame</code></td></tr>
       <tr><td>Firm and non-firm service</td><td>an equilibrium on any network under the two-tier rule, served in full</td><td><code>NonFirmGame</code></td></tr>
     </tbody>
@@ -153,7 +158,7 @@ footer { border-top: 1px solid var(--line); margin-top: 34px; padding: 22px 20px
     --rules uniform,proportional,utilitarian --kappa 0.4 --beta 0.5 --html report.html</code></pre>
   <figure>
     <img src="figures/rules.svg" alt="Bar chart of served and requested megawatts at buses 9, 13 and 14 under the uniform, proportional, and utilitarian rules.">
-    <p class="caption">Three rules on one batch of the IEEE 14-bus system. The uniform rule serves less in total, but every request is honest. The proportional rule serves more, yet every applicant inflates its request by 1.69 and pays for capacity it does not get. The utilitarian rule reaches the planner's total here, by concentrating service on the site that loads the limits least.</p>
+    <p class="caption">Three rules on one batch of the IEEE 14-bus system. The uniform rule serves less in total, but <span class="hl">every request is honest</span>. The proportional rule serves more, yet every applicant <span class="hl-red">inflates its request by 1.69</span> and pays for capacity it does not get. The utilitarian rule reaches the planner's total here, by concentrating service on the site that loads the limits least.</p>
   </figure>
   <p>For batches of any size on large networks, <code>--implicit</code> keeps the exact network region implicit and queries it with linear programs, at seconds per allocation on the 2,000-bus grid.</p>
 </section>
@@ -163,10 +168,10 @@ footer { border-top: 1px solid var(--line); margin-top: 34px; padding: 22px 20px
   <div class="table-wrap"><table>
     <thead><tr><th>Environment</th><th>Interface</th><th>Actions</th></tr></thead>
     <tbody>
-      <tr><td><code>BatchRequestParallelEnv</code></td><td>PettingZoo</td><td>a request (continuous)</td></tr>
+      <tr><td><code>BatchRequestParallelEnv</code></td><td>PettingZoo</td><td>a request at a fixed bus (continuous)</td></tr>
       <tr><td><code>SingleApplicantEnv</code></td><td>Gymnasium</td><td>one learner against fixed rival policies</td></tr>
-      <tr><td><code>LocationParallelEnv</code></td><td>PettingZoo</td><td>a bus from a menu (discrete)</td></tr>
-      <tr><td><code>DeviceParallelEnv</code></td><td>PettingZoo</td><td>a request plus a generator, battery, or non-firm share</td></tr>
+      <tr><td><code>LocationParallelEnv</code></td><td>PettingZoo</td><td>a bus from a menu (discrete); requests at their equilibrium</td></tr>
+      <tr><td><code>DeviceParallelEnv</code></td><td>PettingZoo</td><td>a request plus a generator, battery, or non-firm share, at a fixed bus</td></tr>
       <tr><td><code>VectorBatchRequestEnv</code></td><td>NumPy, many copies per call</td><td>batched requests, about 50 times faster</td></tr>
     </tbody>
   </table></div>
@@ -179,7 +184,7 @@ env = BatchRequestParallelEnv(game, rounds=20, observation="public")
 run("uniform-ieee14", "independent_pg", seed=0)      # exploitability, distance to w, efficiency</code></pre>
   <figure class="narrow">
     <img src="figures/benchmarks.svg" alt="Heat map of the exploitability of the final profile for eight benchmark tasks and three baselines.">
-    <p class="caption">Eight tasks with known answers and three baselines, mean over three seeds. Each cell is the exploitability of the final profile: the largest gain any agent has from deviating alone, relative to its value at its hosting capacity (0 at an equilibrium). Policy gradient, which sees only rewards, reaches the equilibrium wherever one exists. In the generation game with no pure equilibrium, every baseline stays exploitable. Under the proportional rule with a minimum allocation, best responses stall: the best payoff is a vanishing undercut of a rival, and it is never attained.</p>
+    <p class="caption">Eight tasks with known answers and three baselines, mean over three seeds. Each cell is the exploitability of the final profile: the largest gain any agent has from deviating alone, relative to its value at its hosting capacity (0 at an equilibrium). <span class="hl">Policy gradient, which sees only rewards, reaches the equilibrium wherever one exists.</span> In the generation game with no pure equilibrium, every baseline stays exploitable. Under the proportional rule with a minimum allocation, best responses stall: the best payoff is a vanishing undercut of a rival, and it is never attained.</p>
   </figure>
 </section>
 
