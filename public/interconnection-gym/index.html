@@ -173,6 +173,8 @@ footer { border-top: 1px solid var(--line); margin-top: 34px; padding: 22px 20px
       <tr><td><code>LocationParallelEnv</code></td><td>PettingZoo</td><td>a bus from a menu (discrete); requests at their equilibrium</td></tr>
       <tr><td><code>DeviceParallelEnv</code></td><td>PettingZoo</td><td>a request plus a generator, battery, or non-firm share, at a fixed bus</td></tr>
       <tr><td><code>VectorBatchRequestEnv</code></td><td>NumPy, many copies per call</td><td>batched requests, about 50 times faster</td></tr>
+      <tr><td><code>SequentialBatchEnv</code></td><td>PettingZoo</td><td>requests in a queue studied batch after batch; agents arrive and leave</td></tr>
+      <tr><td><code>OperatorEnv</code>, <code>SequentialOperatorEnv</code></td><td>Gymnasium</td><td>the <em>operator's</em> choice of rule, \(\beta\), and \(\kappa\); applicants answer at equilibrium</td></tr>
     </tbody>
   </table></div>
 <pre><code>from icgym import BatchGame, PerMWCommitment, UniformRule, ieee14
@@ -186,6 +188,15 @@ run("uniform-ieee14", "independent_pg", seed=0)      # exploitability, distance 
     <img src="figures/benchmarks.svg" alt="Heat map of the exploitability of the final profile for eight benchmark tasks and three baselines.">
     <p class="caption">Eight tasks with known answers and three baselines, mean over three seeds. Each cell is the exploitability of the final profile: the largest gain any agent has from deviating alone, relative to its value at its hosting capacity (0 at an equilibrium). <span class="hl">Policy gradient, which sees only rewards, reaches the equilibrium wherever one exists.</span> In the generation game with no pure equilibrium, every baseline stays exploitable. Under the proportional rule with a minimum allocation, best responses stall: the best payoff is a vanishing undercut of a rival, and it is never attained.</p>
   </figure>
+</section>
+
+<section>
+  <h2>Beyond One Batch</h2>
+  <div class="two">
+    <div><h3>Sequential batches</h3><p>Real queues run <span class="hl">batch after batch</span>. Applicants arrive at buses with the size they need and a value per megawatt. Each batch is served on the capacity left by earlier batches, net of load growth. Served capacity connects for good, and unserved need waits for the next batch. The ground truth is the equilibrium of every batch, so learners can be scored batch by batch.</p></div>
+    <div><h3>The operator as an agent</h3><p>The operator can learn too. It chooses the rule, the minimum allocation, and the commitment, for one batch or before every batch of a queue. Applicants answer <span class="hl">at equilibrium</span>, and the operator is rewarded for efficiency, minus wasted requests and unfairness. This makes the gym a <span class="hl">mechanism-design benchmark</span>.</p></div>
+  </div>
+  <p>On-site generators, batteries, and curtailment can also be dispatched hour by hour over the network's real days (<code>DeviceRegion</code>), and energy can be charged at locational prices (<code>EnergyCharge</code>). Together these reproduce every network experiment of the accompanying study.</p>
 </section>
 
 <section>
