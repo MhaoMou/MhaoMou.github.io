@@ -77,7 +77,22 @@ ul { margin: 0 0 14px; padding-left: 26px; }
 li { margin: 5px 0; }
 .two { display: grid; grid-template-columns: 1fr 1fr; gap: 26px; }
 .two h3 { margin-top: 4px; }
+.two p { text-align: left; hyphens: manual; }
 footer { border-top: 1px solid var(--line); margin-top: 34px; padding: 22px 20px 44px; font-size: 16px; color: var(--soft); text-align: center; }
+
+/* interactive demo */
+.demo { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 22px; align-items: start; margin: 12px 0 8px; }
+.demo svg { width: 100%; height: auto; display: block; }
+.demo svg text { font-family: "Latin Modern Roman", Georgia, serif; fill: #4a4a4a; font-size: 13px; }
+.controls label { display: block; font-size: 18px; margin: 10px 0 2px; }
+.controls input[type=range] { width: 100%; accent-color: var(--dark); }
+.controls .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; overflow: hidden; margin-top: 2px; }
+.controls .seg button { font: inherit; font-size: 17px; border: 0; background: #fff; padding: 5px 14px; cursor: pointer; color: var(--fg); }
+.controls .seg button.on { background: var(--dark); color: #fff; }
+.readout { margin-top: 14px; font-size: 17.5px; line-height: 1.5; }
+.readout .bad { color: var(--red); font-weight: 700; }
+.readout .good { color: var(--dark); font-weight: 700; }
+@media (max-width: 720px) { .demo { grid-template-columns: 1fr; } }
 @media (max-width: 720px) {
   body { font-size: 18px; }
   h1.title { font-size: 34px; }
@@ -133,6 +148,29 @@ footer { border-top: 1px solid var(--line); margin-top: 34px; padding: 22px 20px
   <p>The package also models the proportional and utilitarian rules, flat fees and security deposits, location choice, on-site generation and storage, and firm and non-firm service.</p>
 </section>
 
+<section id="demo">
+  <h2>Try It</h2>
+  <p>Two applicants at buses 9 and 13 of the IEEE 14-bus system, each valuing a megawatt at \(V = 1\). Choose the rule, the minimum allocation \(\beta\), and the commitment \(\kappa\) per requested megawatt. The page computes the applicants' equilibrium requests, the same way the package does: the theory's answer where it is known, and best-response dynamics otherwise.</p>
+  <div class="demo">
+    <svg id="demo-svg" viewBox="0 0 440 300" role="img" aria-labelledby="demo-t demo-d">
+      <title id="demo-t">Batch region of buses 9 and 13 with the equilibrium of the chosen rule</title>
+      <desc id="demo-d">The shaded polygon is the set of served loads the network can host. Hollow circle: equilibrium requests; filled circle: served loads; blue dot: the planner's optimum.</desc>
+    </svg>
+    <div class="controls">
+      <label>Rule</label>
+      <div class="seg" role="group" aria-label="Allocation rule">
+        <button type="button" data-rule="uniform" class="on">uniform</button><button type="button" data-rule="proportional">proportional</button>
+      </div>
+      <label for="beta">Minimum allocation \(\beta\) = <span id="beta-v">0.50</span></label>
+      <input id="beta" type="range" min="0" max="0.95" step="0.05" value="0.5">
+      <label for="kappa">Commitment \(\kappa\) per MW = <span id="kappa-v">0.40</span> (0 is a flat fee)</label>
+      <input id="kappa" type="range" min="0" max="0.95" step="0.05" value="0.4">
+      <div class="readout" id="readout" aria-live="polite"></div>
+    </div>
+  </div>
+  <p class="caption">Shaded: the served loads the network can host. Hollow red circle: the applicants' equilibrium requests; filled red circle: what the rule serves; blue dot: the planner's optimum; dashed box: the flat-fee band of equilibria. Links can preset the controls, for example <a href="?rule=proportional&amp;beta=0&amp;kappa=0.4#demo">the proportional rule without a minimum allocation</a>.</p>
+</section>
+
 <section>
   <h2>What the Theory Guarantees</h2>
   <p>Each result is exposed as an oracle in the package, and the test suite checks it against the engine.</p>
@@ -149,6 +187,10 @@ footer { border-top: 1px solid var(--line); margin-top: 34px; padding: 22px 20px
       <tr><td>Firm and non-firm service</td><td>an equilibrium on any network under the two-tier rule, served in full</td><td><code>NonFirmGame</code></td></tr>
     </tbody>
   </table></div>
+  <figure>
+    <img src="figures/poa.svg" alt="Price of anarchy of 60 batches of the synthetic Texas grid against the spread of hosting capacities, with the bounds for two, three, and five applicants.">
+    <p class="caption"><b>How much does fairness cost?</b> The price of anarchy of the uniform rule's equilibrium, for 60 random batches of two, three, and five applicants on the 2,000-bus synthetic Texas grid, against the spread \(R\) of their single-bus hosting capacities. <span class="hl">No batch exceeds the bound</span> \((1+nR)^2/(4nR)\), pairs come within 0.4% of it, and every batch stays below \(R\): the loss is set by how unequal the sites are.</p>
+  </figure>
 </section>
 
 <section>
@@ -196,7 +238,19 @@ run("uniform-ieee14", "independent_pg", seed=0)      # exploitability, distance 
     <div><h3>Sequential batches</h3><p>Real queues run <span class="hl">batch after batch</span>. Applicants arrive at buses with the size they need and a value per megawatt. Each batch is served on the capacity left by earlier batches, net of load growth. Served capacity connects for good, and unserved need waits for the next batch. The ground truth is the equilibrium of every batch, so learners can be scored batch by batch.</p></div>
     <div><h3>The operator as an agent</h3><p>The operator can learn too. It chooses the rule, the minimum allocation, and the commitment, for one batch or before every batch of a queue. Applicants answer <span class="hl">at equilibrium</span>, and the operator is rewarded for efficiency, minus wasted requests and unfairness. This makes the gym a <span class="hl">mechanism-design benchmark</span>.</p></div>
   </div>
+  <figure>
+    <img src="figures/queue.svg" alt="Cumulative capacity connected and capacity requested but not served over ten batches, under three rules and fees.">
+    <p class="caption"><b>A queue, batch after batch.</b> Twenty random queues on five buses of the IEEE 14-bus system; lines are means and shaded bands the middle half. All three regimes connect about the same capacity (the proportional rule about 5% more). Their waste differs: <span class="hl">the uniform rule with a per-MW commitment wastes nothing</span>, the proportional rule wastes some, and <span class="hl-red">a flat fee leads applicants to request about twice what they are served</span>, clogging the study with capacity no one will build.</p>
+  </figure>
+  <figure>
+    <img src="figures/operator.svg" alt="Heat maps of the operator's objective over the minimum allocation and the commitment for the uniform and proportional rules, and a learning curve of an operator searching over its choices.">
+    <p class="caption"><b>The operator's landscape.</b> Efficiency minus half the wasted requests, averaged over twelve batches of the synthetic Texas grid with values between 1 and 2 per MW, at the applicants' equilibria. (a) The uniform rule earns the same for every positive commitment (honest requests, efficiency \(1/\mathrm{PoA}\)); a flat fee wastes, and a commitment above the values drives applicants out. (b) The proportional rule <span class="hl">does better when the commitment is close to the value</span>: its inflation factor \(\rho = (1-1/n)V/\kappa\) falls to one, so requests become honest while the rule serves more. (c) A simple operator learner (cross-entropy search) finds that corner.</p>
+  </figure>
   <p>On-site generators, batteries, and curtailment can also be dispatched hour by hour over the network's real days (<code>DeviceRegion</code>), and energy can be charged at locational prices (<code>EnergyCharge</code>). With them the package reproduces the accompanying study&rsquo;s experiments, except those run on its full production evaluator.</p>
+  <figure>
+    <img src="figures/generation.svg" alt="Equilibrium regimes of two applicants with on-site generators against the generator cost, for run-hour budgets of 1 to 8 hours a day and under the crediting rule.">
+    <p class="caption"><b>Who builds on-site generation?</b> Two applicants at buses 1 and 2 of the IEEE 14-bus system, generators dispatched over the real days within a daily run-hour budget \(h\). Cheap generators are built by everyone and expensive ones by no one; in between, <span class="hl-red">no pure equilibrium exists</span>, because building helps the builder one for one while scrapping hurts everyone. Crediting the freed capacity to its owner <span class="hl">narrows that band</span>, from $1.7&ndash;6.6M to $3.4&ndash;5.1M per MW at 2 h/day.</p>
+  </figure>
 </section>
 
 <section>
@@ -236,5 +290,132 @@ game.exploitability([1.5, 1.0, 2.0])           # applicant 0 gains 0.2 by return
 <footer class="container">
   Code under the MIT license; bundled data under the terms in the <a href="docs/data/">data notes</a>. Set in Latin Modern (GUST Font License). Layout after the Nerfies project page.
 </footer>
+<script>
+(() => {
+  const A = [[0.990238, 0.139389], [0.0, 1.0], [0.253739, 0.967273], [0.398638, 0.917109], [0.292382, 0.956301]];
+  const b = [101.9454, 50.7913, 51.1051, 59.0679, 52.7621];
+  const POLY = [[0, 0], [102.95, 0], [100.0, 20.94], [71.62, 33.28], [53.87, 38.7], [7.79, 50.79], [0, 50.79]];
+  const H = [102.95, 50.79], PLANNER = [100.0, 20.94], PLAN_TOTAL = 120.94;
+  const TOL = 1e-9;
+  const dot = (row, x) => row[0] * x[0] + row[1] * x[1];
+
+  function waterFill(r, active) {                 // the uniform rule (water-filling), as in icgym.water_fill
+    const s = [0, 0];
+    let rising = [0, 1].map(i => active[i] && r[i] > TOL);
+    for (let guard = 0; guard < 4 && rising.some(Boolean); guard++) {
+      const fixed = A.map(row => row.reduce((a, v, i) => a + (rising[i] ? 0 : v * s[i]), 0));
+      const rate = A.map(row => row.reduce((a, v, i) => a + (rising[i] ? v : 0), 0));
+      const tl = A.map((row, c) => rate[c] > 1e-12 ? Math.max((b[c] - fixed[c]) / rate[c], 0) : Infinity);
+      const treq = Math.min(...[0, 1].filter(i => rising[i]).map(i => r[i]));
+      const t = Math.min(Math.min(...tl), treq);
+      [0, 1].forEach(i => { if (rising[i]) s[i] = t; });
+      const stop = [0, 1].map(i => rising[i] && r[i] <= t * (1 + 1e-12) + TOL);
+      tl.forEach((tc, c) => { if (tc <= t * (1 + 1e-12) + 1e-9) [0, 1].forEach(i => { if (rising[i] && A[c][i] > 1e-12) stop[i] = true; }); });
+      if (!stop.some(Boolean)) break;
+      rising = rising.map((x, i) => x && !stop[i]);
+    }
+    return s.map((x, i) => Math.min(x, r[i]));
+  }
+  function proportional(r, active) {             // largest common fraction of the requests
+    const ra = r.map((x, i) => active[i] ? x : 0);
+    let alpha = 1;
+    A.forEach((row, c) => { const l = dot(row, ra); if (l > 1e-12) alpha = Math.min(alpha, b[c] / l); });
+    return ra.map(x => alpha * x);
+  }
+  function allocate(rule, beta, r) {             // with the minimum allocation and the rule's cut order
+    const active = r.map(x => x > TOL);
+    for (let k = 0; k < 3; k++) {
+      const s = (rule === "uniform" ? waterFill(r, active) : proportional(r, active)).map((x, i) => active[i] ? x : 0);
+      const short = [0, 1].filter(i => active[i] && s[i] < beta * r[i] * (1 - 1e-9));
+      if (!short.length) return s;
+      let cut = short[0];
+      if (rule === "uniform") { short.forEach(i => { if (r[i] > r[cut]) cut = i; }); }
+      else {
+        const ra = r.map((x, i) => active[i] ? x : 0);
+        let cc = 0;
+        A.forEach((row, c) => { if (dot(row, ra) / b[c] > dot(A[cc], ra) / b[cc]) cc = c; });
+        short.forEach(i => { if (A[cc][i] * r[i] > A[cc][cut] * r[cut]) cut = i; });
+      }
+      active[cut] = false;
+    }
+    return [0, 0];
+  }
+  const W = waterFill([Infinity, Infinity], [true, true]);   // the max-min fair point, from the same limits
+  const pay = (rule, beta, kappa, r, i) => allocate(rule, beta, r)[i] - kappa * r[i];
+  function bestResponse(rule, beta, kappa, r, i) {
+    const upper = 1.05 * Math.max(3 * H[i], beta > 0 ? H[i] / beta : 0, r[i]);
+    let best = r[i], bv = pay(rule, beta, kappa, r, i);
+    const tryX = x => { const q = r.slice(); q[i] = x; const v = pay(rule, beta, kappa, q, i); if (v > bv + 1e-12) { bv = v; best = x; } };
+    for (let k = 0; k <= 900; k++) tryX(upper * k / 900);
+    const step = upper / 900;
+    for (let k = -40; k <= 40; k++) tryX(Math.max(0, best + step * k / 20));
+    return [best, bv];
+  }
+  function equilibrium(rule, beta, kappa) {
+    if (rule === "uniform" && kappa > 0) return { r: W.slice(), settled: true, note: "the max-min fair point w: the unique equilibrium" };
+    if (rule === "uniform") return { r: beta > 0 ? W.map(x => x / beta) : W.slice(), settled: true, band: true,
+                                     note: "flat fee: every request in [w, w/β] is an equilibrium (shown: the top)" };
+    let r = W.slice(), settled = false;
+    for (let round = 0; round < 40 && !settled; round++) {
+      const prev = r.slice(); let gain = 0;
+      for (let i = 0; i < 2; i++) {
+        const before = pay(rule, beta, kappa, r, i);
+        const [x, v] = bestResponse(rule, beta, kappa, r, i);
+        gain = Math.max(gain, v - before); r[i] = x;
+      }
+      settled = Math.abs(r[0] - prev[0]) < 1e-3 && Math.abs(r[1] - prev[1]) < 1e-3 && gain < 1e-6;
+    }
+    return { r, settled, note: settled ? "best-response dynamics settled" : "best responses did not settle: each undercuts the other near the cut" };
+  }
+
+  // ---------------------------------------------------------------- drawing
+  const svg = document.getElementById("demo-svg"), NS = "http://www.w3.org/2000/svg";
+  const X0 = 52, Y0 = 258, SX = 2.05, SY = 2.6, XMAX = 180, YMAX = 90;
+  const px = x => X0 + Math.min(x, XMAX) * SX, py = y => Y0 - Math.min(y, YMAX) * SY;
+  const el = (tag, attrs, text) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (text) e.textContent = text; svg.appendChild(e); return e; };
+  function draw(eq, s) {
+    [...svg.querySelectorAll(".dyn, .axis")].forEach(e => e.remove());
+    el("polygon", { class: "axis", points: POLY.map(([x, y]) => `${px(x)},${py(y)}`).join(" "), fill: "#BDD7EE", stroke: "#1F4E79", "stroke-width": 1.8 });
+    el("line", { class: "axis", x1: px(0), y1: py(0), x2: px(XMAX), y2: py(0), stroke: "#6b6b6b" });
+    el("line", { class: "axis", x1: px(0), y1: py(0), x2: px(0), y2: py(YMAX), stroke: "#6b6b6b" });
+    [0, 30, 60, 90, 120, 150, 180].forEach(t => el("text", { class: "axis", x: px(t), y: Y0 + 17, "text-anchor": "middle" }, String(t)));
+    [0, 30, 60, 90].forEach(t => el("text", { class: "axis", x: X0 - 8, y: py(t) + 4, "text-anchor": "end" }, String(t)));
+    el("text", { class: "axis", x: px(90), y: Y0 + 36, "text-anchor": "middle" }, "bus 9 (MW)");
+    el("text", { class: "axis", x: 14, y: py(45), "text-anchor": "middle", transform: `rotate(-90 14 ${py(45)})` }, "bus 13 (MW)");
+    if (eq.band) el("rect", { class: "dyn", x: px(W[0]), y: py(eq.r[1]), width: px(eq.r[0]) - px(W[0]), height: py(W[1]) - py(eq.r[1]),
+                              fill: "#F4D6D2", "fill-opacity": 0.6, stroke: "#C0392B", "stroke-dasharray": "4 3" });
+    el("circle", { class: "dyn", cx: px(PLANNER[0]), cy: py(PLANNER[1]), r: 5, fill: "#1F4E79", stroke: "#fff", "stroke-width": 1.5 });
+    el("text", { class: "dyn", x: px(PLANNER[0]) + 8, y: py(PLANNER[1]) + 4 }, "planner");
+    el("line", { class: "dyn", x1: px(eq.r[0]), y1: py(eq.r[1]), x2: px(s[0]), y2: py(s[1]), stroke: "#C0392B", "stroke-dasharray": "3 3" });
+    el("circle", { class: "dyn", cx: px(eq.r[0]), cy: py(eq.r[1]), r: 7, fill: "#fff", stroke: "#C0392B", "stroke-width": 2 });
+    el("circle", { class: "dyn", cx: px(s[0]), cy: py(s[1]), r: 6, fill: "#C0392B", stroke: "#fff", "stroke-width": 1.5 });
+    const off = eq.r[0] > XMAX || eq.r[1] > YMAX;
+    el("text", { class: "dyn", x: px(Math.min(eq.r[0], XMAX)) - 10, y: py(Math.min(eq.r[1], YMAX)) - 10, "text-anchor": "end", fill: "#C0392B" },
+       off ? "requests (off the chart)" : "requests");
+  }
+  const f1 = x => x.toFixed(1);
+  function update() {
+    const rule = document.querySelector(".seg button.on").dataset.rule;
+    const beta = +document.getElementById("beta").value, kappa = +document.getElementById("kappa").value;
+    document.getElementById("beta-v").textContent = beta.toFixed(2);
+    document.getElementById("kappa-v").textContent = kappa.toFixed(2);
+    const eq = equilibrium(rule, beta, kappa), s = allocate(rule, beta, eq.r);
+    draw(eq, s);
+    const req = eq.r[0] + eq.r[1], got = s[0] + s[1], waste = req > 1e-9 ? (req - got) / req : 0;
+    document.getElementById("readout").innerHTML =
+      `<div>${eq.note}.</div>` +
+      `<div>Requests: ${f1(eq.r[0])}, ${f1(eq.r[1])} MW. Served: ${f1(s[0])}, ${f1(s[1])} MW.</div>` +
+      `<div>Efficiency: <span class="good">${(100 * got / PLAN_TOTAL).toFixed(0)}%</span> of the planner's ${f1(PLAN_TOTAL)} MW. ` +
+      `Requested but not served: <span class="${waste > 0.005 ? "bad" : "good"}">${(100 * waste).toFixed(0)}%</span>.</div>`;
+  }
+  document.querySelectorAll(".seg button").forEach(btn => btn.addEventListener("click", () => {
+    document.querySelectorAll(".seg button").forEach(x => x.classList.toggle("on", x === btn)); update(); }));
+  ["beta", "kappa"].forEach(id => document.getElementById(id).addEventListener("input", update));
+  const q = new URLSearchParams(location.search);      // e.g. ?rule=proportional&beta=0&kappa=0.4
+  if (q.get("rule")) document.querySelectorAll(".seg button").forEach(x => x.classList.toggle("on", x.dataset.rule === q.get("rule")));
+  ["beta", "kappa"].forEach(id => { if (q.get(id) !== null) document.getElementById(id).value = q.get(id); });
+  update();
+})();
+</script>
 </body>
 </html>
