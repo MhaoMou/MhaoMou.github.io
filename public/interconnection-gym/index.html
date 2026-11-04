@@ -80,6 +80,12 @@ li { margin: 5px 0; }
 .two p { text-align: left; hyphens: manual; }
 footer { border-top: 1px solid var(--line); margin-top: 34px; padding: 22px 20px 44px; font-size: 16px; color: var(--soft); text-align: center; }
 
+
+.takeaways { border: 1.5px solid var(--dark); border-radius: 10px; padding: 18px 22px 8px; margin: 22px 0 10px; background: #f6f9fc; }
+.takeaways h3 { margin: 0 0 8px; color: var(--dark); }
+.takeaways ol { margin: 0 0 10px; padding-left: 24px; }
+.takeaways li { margin: 7px 0; }
+.limits li { margin: 7px 0; }
 /* interactive demo */
 .demo { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 22px; align-items: start; margin: 12px 0 8px; }
 .demo svg { width: 100%; height: auto; display: block; }
@@ -203,6 +209,18 @@ footer { border-top: 1px solid var(--line); margin-top: 34px; padding: 22px 20px
     <p class="caption">Three rules on one batch of the IEEE 14-bus system. The uniform rule serves less in total, but <span class="hl">every request is honest</span>. The proportional rule serves more, yet every applicant <span class="hl-red">inflates its request by 1.69</span> and pays for capacity it does not get. The utilitarian rule reaches the planner's total here, by concentrating service on the site that loads the limits least.</p>
   </figure>
   <p>For batches of any size on large networks, <code>--implicit</code> keeps the exact network region implicit and queries it with linear programs, at seconds per allocation on the 2,000-bus grid.</p>
+  <div class="takeaways" id="takeaways">
+    <h3>Takeaways for operators</h3>
+    <ol>
+      <li><b>Pair the allocation formula with a commitment per requested megawatt.</b> Under the uniform rule, any positive commitment makes the max-min fair point the unique equilibrium. Every request is then honest and served in full, and nothing is paid for that is not built.</li>
+      <li><b>Avoid flat fees.</b> With a fee that does not grow with the request, every request up to \(1/\beta\) times the fair share is an equilibrium. Studies then fill with capacity no one will build.</li>
+      <li><b>Keep the minimum allocation well below one.</b> A high minimum combined with coarse request sizes makes applicants ask for less than the network can host. Under the proportional rule it can also keep requests from settling at all.</li>
+      <li><b>If you use the proportional rule, set the commitment close to the value of a megawatt.</b> Its inflation factor \(\rho = (1-1/n)V/\kappa\) then falls to one: requests become honest, and on batches of the synthetic Texas grid the rule serves nearly the planner's total. But a commitment above an applicant's value prices it out, and operators rarely know values. The uniform rule needs only a positive commitment, and it is the rule that gives applicants <em>equal megawatts</em>.</li>
+      <li><b>Offer non-firm service as a second tier.</b> Studying firm requests first, and non-firm requests on the off-peak room left, has an equilibrium on any network, with every request served in full.</li>
+      <li><b>Credit on-site generation and flexibility to its owner.</b> When the capacity a generator frees is shared, applicants wait for each other to build and no stable outcome exists. On a real network, each owner's credit should not depend on its rivals' generation.</li>
+      <li><b>Expect the efficiency loss to track the spread of the sites.</b> Equal shares cost the most when sites differ most in what the network can host at them, and the price of anarchy is bounded by \((1+nR)^2/(4nR)\), a function of that spread \(R\) alone.</li>
+    </ol>
+  </div>
 </section>
 
 <section>
@@ -244,13 +262,27 @@ run("uniform-ieee14", "independent_pg", seed=0)      # exploitability, distance 
   </figure>
   <figure>
     <img src="figures/operator.svg" alt="Heat maps of the operator's objective over the minimum allocation and the commitment for the uniform and proportional rules, and a learning curve of an operator searching over its choices.">
-    <p class="caption"><b>The operator's landscape.</b> Efficiency minus half the wasted requests, averaged over twelve batches of the synthetic Texas grid with values between 1 and 2 per MW, at the applicants' equilibria. (a) The uniform rule earns the same for every positive commitment (honest requests, efficiency \(1/\mathrm{PoA}\)); a flat fee wastes, and a commitment above the values drives applicants out. (b) The proportional rule <span class="hl">does better when the commitment is close to the value</span>: its inflation factor \(\rho = (1-1/n)V/\kappa\) falls to one, so requests become honest while the rule serves more. (c) A simple operator learner (cross-entropy search) finds that corner.</p>
+    <p class="caption"><b>The operator's landscape.</b> Efficiency minus half the wasted requests, averaged over twelve batches of the synthetic Texas grid with values between 1 and 2 per MW, at the applicants' equilibria. (a) The uniform rule earns the same for every positive commitment (honest requests, efficiency \(1/\mathrm{PoA}\)); a flat fee wastes, and a commitment above the values drives applicants out. (b) The proportional rule <span class="hl">does better when the commitment is close to the value</span>: its inflation factor \(\rho = (1-1/n)V/\kappa\) falls to one, so requests become honest while the rule serves more. (c) A simple operator learner (cross-entropy search) finds that corner. Adding a fairness term (Jain's index) changes the choice only when fairness means <em>equal megawatts</em> and counts at least 2.4 times as much as efficiency; when fairness means equal shares of each site's hosting capacity, the proportional rule is also the fairer one.</p>
   </figure>
   <p>On-site generators, batteries, and curtailment can also be dispatched hour by hour over the network's real days (<code>DeviceRegion</code>), and energy can be charged at locational prices (<code>EnergyCharge</code>). With them the package reproduces the accompanying study&rsquo;s experiments, except those run on its full production evaluator.</p>
   <figure>
     <img src="figures/generation.svg" alt="Equilibrium regimes of two applicants with on-site generators against the generator cost, for run-hour budgets of 1 to 8 hours a day and under the crediting rule.">
     <p class="caption"><b>Who builds on-site generation?</b> Two applicants at buses 1 and 2 of the IEEE 14-bus system, generators dispatched over the real days within a daily run-hour budget \(h\). Cheap generators are built by everyone and expensive ones by no one; in between, <span class="hl-red">no pure equilibrium exists</span>, because building helps the builder one for one while scrapping hurts everyone. Crediting the freed capacity to its owner <span class="hl">narrows that band</span>, from $1.7&ndash;6.6M to $3.4&ndash;5.1M per MW at 2 h/day.</p>
   </figure>
+</section>
+
+<section id="limits">
+  <h2>Scope and Limitations</h2>
+  <p>The gym is a model for comparing rules and studying strategic behavior. It is not a substitute for an interconnection study. Its main simplifications:</p>
+  <ul class="limits">
+    <li><b>Network model.</b> DC power flow with thermal branch limits and redispatch of existing generators. There is no AC power flow (voltage, reactive power, stability), and no N-1 or other contingency constraints, so hosting capacities are optimistic compared with a security-constrained study.</li>
+    <li><b>Time.</b> Five representative days of hourly load stand for a year, and the base load does not grow, except through the optional growth term of sequential batches.</li>
+    <li><b>Data.</b> The 2,000-bus grid is synthetic. It is not ERCOT data, an official model, or a forecast. The IEEE 14-bus thermal limits, generator costs, and load shape are the package's own instructional choices.</li>
+    <li><b>Applicants.</b> Applicants know the rule, the network, and each other's values. Each wants capacity at one site (or in fixed proportions across sites) and is risk neutral. Values and costs are illustrative.</li>
+    <li><b>Counterflow.</b> Exported regions treat the relief one new load gives another as non-firm, which is conservative. <code>DCOPFRegion</code> keeps the exact region.</li>
+    <li><b>Equilibria.</b> Where the theory gives no closed form, equilibria are found by numerical search on strategy grids or by best-response dynamics. These can miss narrow profitable deviations, and under a minimum allocation they may not settle.</li>
+    <li><b>Prices and devices.</b> Energy prices are DC locational marginal prices from linear generator costs. Capacity markets and transmission cost allocation are not modeled. Storage and run-hour budgets are dispatched within each day, without the full production evaluator's economics.</li>
+  </ul>
 </section>
 
 <section>
