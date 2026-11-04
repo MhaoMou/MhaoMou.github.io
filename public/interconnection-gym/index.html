@@ -196,7 +196,7 @@ run("uniform-ieee14", "independent_pg", seed=0)      # exploitability, distance 
     <div><h3>Sequential batches</h3><p>Real queues run <span class="hl">batch after batch</span>. Applicants arrive at buses with the size they need and a value per megawatt. Each batch is served on the capacity left by earlier batches, net of load growth. Served capacity connects for good, and unserved need waits for the next batch. The ground truth is the equilibrium of every batch, so learners can be scored batch by batch.</p></div>
     <div><h3>The operator as an agent</h3><p>The operator can learn too. It chooses the rule, the minimum allocation, and the commitment, for one batch or before every batch of a queue. Applicants answer <span class="hl">at equilibrium</span>, and the operator is rewarded for efficiency, minus wasted requests and unfairness. This makes the gym a <span class="hl">mechanism-design benchmark</span>.</p></div>
   </div>
-  <p>On-site generators, batteries, and curtailment can also be dispatched hour by hour over the network's real days (<code>DeviceRegion</code>), and energy can be charged at locational prices (<code>EnergyCharge</code>). Together these reproduce every network experiment of the accompanying study.</p>
+  <p>On-site generators, batteries, and curtailment can also be dispatched hour by hour over the network's real days (<code>DeviceRegion</code>), and energy can be charged at locational prices (<code>EnergyCharge</code>). With them the package reproduces the accompanying study&rsquo;s experiments, except those run on its full production evaluator.</p>
 </section>
 
 <section>
