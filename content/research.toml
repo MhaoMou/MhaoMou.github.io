@@ -4,8 +4,8 @@ description = "Research themes and current project directions."
 
 [[items]]
 title = "interconnection-gym"
-content = "Open-source simulator, RL environments, and benchmark for the batch interconnection of large loads such as data centers: allocation rules, equilibrium oracles, and network-derived scenarios."
-tags = ["power systems", "game theory", "multi-agent RL", "open source"]
+content = "Open-source policy simulator for the batch interconnection of large loads such as data centers: allocation rules, fees, equilibrium oracles, and network-derived scenarios."
+tags = ["power systems", "game theory", "mechanism design", "open source"]
 link = "/interconnection-gym/"
 
 [[items]]

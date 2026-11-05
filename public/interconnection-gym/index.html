@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>interconnection-gym</title>
-<meta name="description" content="interconnection-gym: a simulator, reinforcement-learning environments, and a benchmark for the batch interconnection of large loads such as data centers, with equilibria known in closed form.">
+<meta name="description" content="interconnection-gym: a policy simulator for the batch interconnection of large loads such as data centers. Compare allocation rules and fees on real network data, with equilibria known in closed form.">
 <meta property="og:title" content="interconnection-gym">
-<meta property="og:description" content="Batch interconnection of large loads as a multi-agent game: allocation rules, equilibrium oracles, RL environments, and benchmarks.">
+<meta property="og:description" content="A policy simulator for batch interconnection of large loads: allocation rules, fees, network-derived scenarios, and equilibrium oracles.">
 <link rel="icon" href="/favicon.png">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
@@ -133,7 +133,7 @@ footer { border-top: 1px solid var(--line); margin-top: 34px; padding: 22px 20px
 
 <div class="container wide teaser">
   <img src="figures/teaser.svg" alt="Three panels: a map of the synthetic Texas grid with six candidate buses and the equilibrium placement of three applicants; the batch region of two buses with the water-filling equilibrium and the planner's optimum; exploitability of independent policy-gradient learners over training on four tasks.">
-  <p class="caption"><b>(a)</b> Three applicants choose among six buses of the 2,000-bus synthetic Texas grid. At the equilibrium of the location game, two share the bus with the largest hosting capacity and the third takes a bus of its own. <b>(b)</b> Under the uniform rule, served loads rise together until a shared limit binds. With a commitment per requested megawatt, this max-min fair point is the unique equilibrium (IEEE 14-bus, buses 9 and 13). A planner would serve more in total: the price of anarchy is 1.44. <b>(c)</b> Independent learners that see only their own rewards are scored against the theory. Their exploitability falls toward zero where an equilibrium exists, and stays positive where none does.</p>
+  <p class="caption"><b>(a)</b> Three applicants choose among six buses of the 2,000-bus synthetic Texas grid. At the equilibrium of the location game, two share the bus with the largest hosting capacity and the third takes a bus of its own. <b>(b)</b> Under the uniform rule, served loads rise together until a shared limit binds. With a commitment per requested megawatt, this max-min fair point is the unique equilibrium (IEEE 14-bus, buses 9 and 13). A planner would serve more in total: the price of anarchy is 1.44. <b>(c)</b> Any model of how applicants behave can be scored against the theory. Here, simple adaptive applicants that see only their own payoffs: their exploitability falls toward zero where an equilibrium exists, and stays positive where none does.</p>
 </div>
 
 <main class="container">
@@ -141,10 +141,10 @@ footer { border-top: 1px solid var(--line); margin-top: 34px; padding: 22px 20px
 <section>
   <h2>Overview</h2>
   <p>Requests from data centers and other large loads now arrive faster than grid operators can study them one at a time, so operators such as ERCOT are moving to <span class="hl">batch studies</span> <span class="cite">[<a href="#ref-ercot">1</a>, <a href="#ref-pgrr">2</a>]</span>, much as generator interconnection moved to cluster studies <span class="cite">[<a href="#ref-ferc">3</a>]</span>. Many requests are studied together, and the capacity the network can host is split among them. How it is split shapes what applicants ask for: an applicant that expects to be cut back may <span class="hl-red">inflate its request</span> <span class="cite">[<a href="#ref-cachon">4</a>]</span>, while one that <span class="hl">pays for every requested megawatt</span> has a reason not to.</p>
-  <p><b>interconnection-gym</b> turns this into a multi-agent game on real network data. The equilibria of the allocation rules are <span class="hl">known in closed form</span>, so operators can compare rules before adopting them, and learning agents can be scored against ground truth.</p>
+  <p><b>interconnection-gym</b> turns this into a multi-agent game on real network data. The equilibria of the allocation rules are <span class="hl">known in closed form</span>, so operators can compare rules before adopting them, and any model of applicant behavior can be checked against ground truth.</p>
   <div class="two">
     <div><h3>For operators</h3><p>Compare allocation rules and fees on your own network: who gets served, how much capacity goes unused, and how much applicants inflate their requests at equilibrium.</p></div>
-    <div><h3>For researchers</h3><p>PettingZoo <span class="cite">[<a href="#ref-pz">5</a>]</span> and Gymnasium <span class="cite">[<a href="#ref-gym">6</a>]</span> environments with continuous and discrete actions, proven equilibria, network-derived scenarios, and benchmark tasks scored by exploitability.</p></div>
+    <div><h3>For researchers</h3><p>Games with proven equilibria on network-derived scenarios, for studying allocation rules as mechanisms. Standard multi-agent interfaces (PettingZoo <span class="cite">[<a href="#ref-pz">5</a>]</span>, Gymnasium <span class="cite">[<a href="#ref-gym">6</a>]</span>) let any model of applicant behavior plug in, and tasks are scored by exploitability.</p></div>
   </div>
 </section>
 
@@ -228,12 +228,12 @@ footer { border-top: 1px solid var(--line); margin-top: 34px; padding: 22px 20px
 </section>
 
 <section>
-  <h2>For Researchers: Environments and Benchmarks</h2>
+  <h2>For Researchers: Applicant Models and Benchmarks</h2>
   <div class="table-wrap"><table>
     <thead><tr><th>Environment</th><th>Interface</th><th>Actions</th></tr></thead>
     <tbody>
       <tr><td><code>BatchRequestParallelEnv</code></td><td>PettingZoo</td><td>a request at a fixed bus (continuous)</td></tr>
-      <tr><td><code>SingleApplicantEnv</code></td><td>Gymnasium</td><td>one learner against fixed rival policies</td></tr>
+      <tr><td><code>SingleApplicantEnv</code></td><td>Gymnasium</td><td>one applicant model against fixed rivals</td></tr>
       <tr><td><code>LocationParallelEnv</code></td><td>PettingZoo</td><td>a bus from a menu (discrete); requests at their equilibrium</td></tr>
       <tr><td><code>DeviceParallelEnv</code></td><td>PettingZoo</td><td>a request plus a generator, battery, or non-firm share, at a fixed bus</td></tr>
       <tr><td><code>VectorBatchRequestEnv</code></td><td>NumPy, many copies per call</td><td>batched requests, about 50 times faster</td></tr>
@@ -250,7 +250,7 @@ env = BatchRequestParallelEnv(game, rounds=20, observation="public")
 run("uniform-ieee14", "independent_pg", seed=0)      # exploitability, distance to w, efficiency</code></pre>
   <figure class="narrow">
     <img src="figures/benchmarks.svg" alt="Heat map of the exploitability of the final profile for eight benchmark tasks and three baselines.">
-    <p class="caption">Eight tasks with known answers and three baselines, mean over three seeds. Each cell is the exploitability of the final profile: the largest gain any agent has from deviating alone, relative to its value at its hosting capacity (0 at an equilibrium). <span class="hl">Policy gradient, which sees only rewards, reaches the equilibrium wherever one exists.</span> In the generation game with no pure equilibrium, every baseline stays exploitable. Under the proportional rule with a minimum allocation, best responses stall: the best payoff is a vanishing undercut of a rival, and it is never attained.</p>
+    <p class="caption">Eight tasks with known answers and three baselines, mean over three seeds. Each cell is the exploitability of the final profile: the largest gain any agent has from deviating alone, relative to its value at its hosting capacity (0 at an equilibrium). <span class="hl">Even applicants that adapt from their own payoffs alone (policy gradient) reach the equilibrium wherever one exists.</span> In the generation game with no pure equilibrium, every baseline stays exploitable. Under the proportional rule with a minimum allocation, best responses stall: the best payoff is a vanishing undercut of a rival, and it is never attained.</p>
   </figure>
 </section>
 
@@ -258,7 +258,7 @@ run("uniform-ieee14", "independent_pg", seed=0)      # exploitability, distance 
   <h2>Beyond One Batch</h2>
   <div class="two">
     <div><h3>Sequential batches</h3><p>Real queues run <span class="hl">batch after batch</span>. Applicants arrive at buses with the size they need and a value per megawatt. Each batch is served on the capacity left by earlier batches, net of load growth. Served capacity connects for good, and unserved need waits for the next batch. The ground truth is the equilibrium of every batch, so learners can be scored batch by batch.</p></div>
-    <div><h3>The operator as an agent</h3><p>The operator can learn too. It chooses the rule, the minimum allocation, and the commitment, for one batch or before every batch of a queue. Applicants answer <span class="hl">at equilibrium</span>, and the operator is rewarded for efficiency, minus wasted requests and unfairness. This makes the gym a <span class="hl">mechanism-design benchmark</span>.</p></div>
+    <div><h3>Designing the rule</h3><p>The operator is the designer. It chooses the rule, the minimum allocation, and the commitment, for one batch or before every batch of a queue. Applicants answer <span class="hl">at equilibrium</span>, and each design is scored by efficiency, minus wasted requests and unfairness. This makes the gym a <span class="hl">testbed for mechanism design</span>: a search over designs is checked against the applicants' best responses, not against assumed behavior.</p></div>
   </div>
   <figure>
     <img src="figures/queue.svg" alt="Cumulative capacity connected and capacity requested but not served over ten batches, under three rules and fees.">
@@ -266,7 +266,7 @@ run("uniform-ieee14", "independent_pg", seed=0)      # exploitability, distance 
   </figure>
   <figure>
     <img src="figures/operator.svg" alt="Heat maps of the operator's objective over the minimum allocation and the commitment for the uniform and proportional rules, and a learning curve of an operator searching over its choices.">
-    <p class="caption"><b>The operator's landscape.</b> Efficiency minus half the wasted requests, averaged over twelve batches of the synthetic Texas grid with values between 1 and 2 per MW, at the applicants' equilibria. (a) The uniform rule earns the same for every positive commitment (honest requests, efficiency \(1/\mathrm{PoA}\)); a flat fee wastes, and a commitment above the values drives applicants out. (b) The proportional rule <span class="hl">does better when the commitment is close to the value</span>: its inflation factor \(\rho = (1-1/n)V/\kappa\) falls to one, so requests become honest while the rule serves more. (c) A simple operator learner (cross-entropy search) finds that corner. Adding a fairness term (Jain's index <span class="cite">[<a href="#ref-jain">13</a>]</span>) changes the choice only when fairness means <em>equal megawatts</em> and counts at least 2.4 times as much as efficiency; when fairness means equal shares of each site's hosting capacity, the proportional rule is also the fairer one.</p>
+    <p class="caption"><b>The operator's landscape.</b> Efficiency minus half the wasted requests, averaged over twelve batches of the synthetic Texas grid with values between 1 and 2 per MW, at the applicants' equilibria. (a) The uniform rule earns the same for every positive commitment (honest requests, efficiency \(1/\mathrm{PoA}\)); a flat fee wastes, and a commitment above the values drives applicants out. (b) The proportional rule <span class="hl">does better when the commitment is close to the value</span>: its inflation factor \(\rho = (1-1/n)V/\kappa\) falls to one, so requests become honest while the rule serves more. (c) A simple search over designs (cross-entropy method) finds that corner. Adding a fairness term (Jain's index <span class="cite">[<a href="#ref-jain">13</a>]</span>) changes the choice only when fairness means <em>equal megawatts</em> and counts at least 2.4 times as much as efficiency; when fairness means equal shares of each site's hosting capacity, the proportional rule is also the fairer one.</p>
   </figure>
   <p>On-site generators, batteries, and curtailment can also be dispatched hour by hour over the network's real days (<code>DeviceRegion</code>), and energy can be charged at locational prices (<code>EnergyCharge</code>). With them the package reproduces the accompanying study&rsquo;s experiments, except those run on its full production evaluator.</p>
   <figure>
