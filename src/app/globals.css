@@ -10,13 +10,13 @@
   --background: #fefffe;
   --foreground: #0f172a;
   
-  /* Brand colors - Deep Navy & Gold */
+  /* Original neutral headings with light navy accents */
   --primary: #1e293b;
   --primary-light: #334155;
   --primary-dark: #0f172a;
-  --accent: #d4a562;
-  --accent-light: #e4b976;
-  --accent-dark: #b8914d;
+  --accent: #6585ad;
+  --accent-light: #8ca8cb;
+  --accent-dark: #4c6a92;
   
   /* Neutral colors */
   --neutral-50: #f8fafc;
@@ -143,9 +143,9 @@ html[data-locale^="zh"] {
   --primary: #f8fafc;
   --primary-light: #e2e8f0;
   --primary-dark: #cbd5e1;
-  --accent: #e4b976;
-  --accent-light: #f0c674;
-  --accent-dark: #d4a562;
+  --accent: #91b4df;
+  --accent-light: #b3cbed;
+  --accent-dark: #4c6a92;
   
   /* Dark mode glass effect */
   --glass-bg: rgba(15, 23, 42, 0.8);

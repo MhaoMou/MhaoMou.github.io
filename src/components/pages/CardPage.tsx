@@ -83,6 +83,11 @@ export default function CardPage({ config, embedded = false }: { config: CardPag
                                 ))}
                             </div>
                         )}
+                        {item.link && (
+                            <a href={item.link} className="mt-5 inline-flex items-center gap-2 text-sm font-medium text-accent underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-4" >
+                                {config.title === 'Projects' ? 'Visit project' : 'View details'} <span aria-hidden="true">&rarr;</span>
+                            </a>
+                        )}
                     </motion.div>
                 ))}
             </div>

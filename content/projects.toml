@@ -1,0 +1,10 @@
+type = "card"
+title = "Projects"
+description = "Software and interactive tools from my research."
+
+[[items]]
+title = "interconnection-gym"
+subtitle = "A policy simulator for large-load interconnection"
+content = "An open-source simulator for the batch interconnection of large loads such as data centers. Compare allocation rules and fees on network-derived scenarios, with equilibrium analysis."
+tags = ["Power systems", "Game theory", "Open source"]
+link = "https://mhaomou.github.io/interconnection-gym/"
